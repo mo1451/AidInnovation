@@ -5,6 +5,7 @@ package com.mo1451.mail;
 
 import java.util.UUID;
 
+import com.mo1451.model.User;
 import junit.framework.TestCase;
 
 /**
@@ -13,11 +14,9 @@ import junit.framework.TestCase;
  */
 public class MailSenderTest extends TestCase {
 	private UUID uuid = UUID.randomUUID();
-	/**
-	 * Test method for {@link com.mo1451.mail.MailSender#sendMail()}.
-	 */
+
 	public void testSendMail() {
-		new MailSender().sendMail(uuid,1);
+		new MailSender().sendMail(uuid,new User());
 	}
 
 }

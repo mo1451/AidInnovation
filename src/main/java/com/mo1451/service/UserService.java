@@ -29,7 +29,7 @@ public class UserService {
 	 */
 	public void addUser(User user,UUID uuid) {
 		this.userMapper.insertSelective(user);
-		new MailSender().sendMail(uuid,user.getId());
+		new MailSender().sendMail(uuid,user);
 	}
 	
 	/**
