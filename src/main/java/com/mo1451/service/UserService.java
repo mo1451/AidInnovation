@@ -7,13 +7,17 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Service;
 
 import com.mo1451.mail.MailSender;
 import com.mo1451.mapper.UserMapper;
+import com.mo1451.model.Page;
 import com.mo1451.model.User;
 import com.mo1451.model.UserExample;
+import com.mo1451.model.UserSearch;
 
 /**
  * @author 默1451
@@ -27,9 +31,20 @@ public class UserService {
 	 * 添加用户
 	 * @param user
 	 */
-	public void addUser(User user,UUID uuid) {
+	public void addUser(User user) {
 		this.userMapper.insertSelective(user);
-		new MailSender().sendMail(uuid,user);
+		
+	}
+	
+	public void deleteUserByName(String name) {
+		UserExample userExample = new UserExample();
+		UserExample.Criteria criteria = userExample.createCriteria();
+		criteria.andNameEqualTo(name);
+		this.userMapper.deleteByExample(userExample);
+	}
+	
+	public void sendCheckMail(User user, UUID uuid) {
+		new MailSender().sendMail(uuid,user.getId());
 	}
 	
 	/**
@@ -49,10 +64,8 @@ public class UserService {
 	 * @return
 	 */
 	public boolean checkIdentity(User u, String uuid) {
-		if(u.getUuid().equals(uuid)) {
-			if(u.getIdentity()) {
-				u.setIdentity(false);
-				this.userMapper.updateByPrimaryKey(u);
+		if(u.isUuidRight(uuid)) {
+			if(u.isIdentityChanged()) {
 				return true;
 			} else {
 				return false;
@@ -60,6 +73,11 @@ public class UserService {
 		} else {
 			return false;
 		}
+	}
+	
+	public void changeIdentityInfo(User u) {
+		u.setIdentity(true);
+		this.userMapper.updateByPrimaryKey(u);
 	}
 	
 	/**
@@ -109,13 +127,12 @@ public class UserService {
 	 * @param password
 	 */
 	public List<User> checkPassword(String username, String password) {
-		// TODO Auto-generated method stub
 		UserExample userExample = new UserExample();
 		UserExample.Criteria criteria = userExample.createCriteria();
 		criteria.andNameEqualTo(username);
 		criteria.andPasswordEqualTo(password);
 		List<User> users = this.userMapper.selectByExample(userExample);
-		if(users.size() == 0) {
+		/*if(users.size() == 0) {
 			userExample = new UserExample();
 			criteria = userExample.createCriteria();
 			criteria.andEmailEqualTo(username);
@@ -124,7 +141,8 @@ public class UserService {
 			return users;
 		} else {
 			return users;
-		}
+		}*/
+		return users;
 	}
 
 	/**
@@ -132,9 +150,8 @@ public class UserService {
 	 * @param email
 	 * @param uuid
 	 */
-	public void resetPassword(String email, UUID uuid) {
-		// TODO Auto-generated method stub
-		new MailSender().resetPassword(uuid, email);
+	public void sendResetPasswordEmail(String email, UUID uuid) {
+		new MailSender().sendResetPasswordEmail(uuid, email);
 	}
 
 	/**
@@ -142,7 +159,6 @@ public class UserService {
 	 * @param email
 	 */
 	public boolean changePassword(String email,String password) {
-		// TODO Auto-generated method stub
 		UserExample userExample = new UserExample();
 		UserExample.Criteria criteria = userExample.createCriteria();
 		criteria.andEmailEqualTo(email);
@@ -163,7 +179,6 @@ public class UserService {
 	 * @param introduction
 	 */
 	public void changeInfo(int id, String sex, String industry, String introduction) {
-		// TODO Auto-generated method stub
 		User u = this.userMapper.selectByPrimaryKey(id);
 		if(sex.equals("male")) {
 			u.setSex(true);
@@ -195,4 +210,100 @@ public class UserService {
 		this.userMapper.updateByPrimaryKeySelective(u);
 		return u;
 	}	
+	
+	public void saveUserCookies(HttpServletResponse response, User u) {
+		Cookie cookie = new Cookie("userId", u.getId().toString());
+		cookie.setPath("/");
+		cookie.setMaxAge(-1);
+        response.addCookie(cookie);
+        cookie = new Cookie("username", u.getName());
+		cookie.setPath("/");
+		cookie.setMaxAge(-1);
+        response.addCookie(cookie);
+	}
+	
+	public void saveAdminCookies(HttpServletResponse response, User u) {
+		Cookie cookie = new Cookie("adminId", u.getId().toString());
+		cookie.setPath("/");
+		cookie.setMaxAge(-1);
+        response.addCookie(cookie);
+        cookie = new Cookie("adminname", u.getName());
+		cookie.setPath("/");
+		cookie.setMaxAge(-1);
+        response.addCookie(cookie);
+	}
+	
+	public void saveAdminCookies(HttpServletResponse response) {
+		User u = new User();
+		u.setName("admin");
+		u.setId(-1);
+		this.saveAdminCookies(response, u);
+	}
+
+	/**
+	 * @param page
+	 * @return
+	 */
+	public List<User> getUsersByPage(Page p) {		
+		return this.userMapper.selectByPage(p);
+	}
+
+	/**
+	 * @return
+	 */
+	public int getUserCount() {
+		return this.userMapper.countAllUser();
+	}
+
+	/**
+	 * @param userId
+	 */
+	public void deleteUserById(int userId) {
+		this.userMapper.deleteByPrimaryKey(userId);
+	}
+
+	/**
+	 * @param userIdString
+	 * @param userNameString
+	 * @param userEmailString
+	 * @param p 
+	 * @return
+	 */
+	public List<User> search(String userIdString, String userNameString, String userEmailString, Page page) {
+		UserSearch userSearch = new UserSearch();
+		
+		User user = new User();
+		if(userIdString != null && !userIdString.equals("")) {
+			user.setId(Integer.parseInt(userIdString));
+		}
+		if(userNameString != null && !userNameString.equals("")) {
+			user.setName(userNameString);
+		}
+		if(userEmailString != null && !userEmailString.equals("")) {
+			user.setEmail(userEmailString);
+		}
+		userSearch.setUser(user);
+		userSearch.setPage(page);
+		return userMapper.selectByUserSearch(userSearch);
+	}
+
+	/**
+	 * @param userIdString
+	 * @param userNameString
+	 * @param userEmailString
+	 * @return
+	 */
+	public int getSearchCount(String userIdString, String userNameString, String userEmailString) {
+		User user = new User();
+		if(userIdString != null && !userIdString.equals("")) {
+			user.setId(Integer.parseInt(userIdString));
+		}
+		if(userNameString != null && !userNameString.equals("")) {
+			user.setName(userNameString);
+		}
+		if(userEmailString != null && !userEmailString.equals("")) {
+			user.setEmail(userEmailString);
+		}
+		return userMapper.countSearch(user);
+	}
 }

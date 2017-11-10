@@ -379,7 +379,7 @@
 				<div class="form-group" id="solutiondiv"  style="margin-top:40px;">
 					<label for="solution1" class="col-sm-2 control-label">思路4：</label>
 					<div class="col-sm-8">
-						<textarea class="form-control" rows="4" id="solution4" name="solution4">${solution4 }</textarea>
+						<textarea class="form-control" rows="6" id="solution4" name="solution4">${solution4 }</textarea>
 					</div>
 				</div>
 				

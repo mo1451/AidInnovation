@@ -36,6 +36,7 @@ import com.mo1451.model.ProblemDescrWithBLOBs;
 import com.mo1451.model.Source;
 import com.mo1451.model.Tech;
 import com.mo1451.model.WordWithBLOBs;
+import com.mo1451.service.AllService;
 import com.mo1451.service.ArrangeAndEvaluateService;
 import com.mo1451.service.ProblemDescrService;
 import com.mo1451.service.SolveProblemService;
@@ -115,7 +116,7 @@ public class CreateWordTest extends TestCase {
         configuration.setDefaultEncoding("UTF-8");
 		Map<String, Object> dataMap = new HashMap<String, Object>();
         try {
-        	WordWithBLOBs wwbs = wordService.findWord(38);
+        	WordWithBLOBs wwbs = wordService.getWordWithBLOBs(38);
         	if(wwbs != null) {
         		dataMap.put("causalsol", wwbs.getCausalsol());
 				dataMap.put("img", this.getImageStr("F:/Java/tomcat9.0.0.M11/webapps/AidInnovation/images/cau_img38.png"));
@@ -142,7 +143,7 @@ public class CreateWordTest extends TestCase {
         configuration.setDefaultEncoding("UTF-8");
 		Map<String, Object> dataMap = new HashMap<String, Object>();
         try {
-        	WordWithBLOBs wwbs = wordService.findWord(38);
+        	WordWithBLOBs wwbs = wordService.getWordWithBLOBs(38);
         	if(wwbs != null) {
         		dataMap.put("ninesol", wwbs.getNinesol());
         		dataMap.put("lifesol", wwbs.getLifesol());
@@ -229,7 +230,7 @@ public class CreateWordTest extends TestCase {
         configuration.setDefaultEncoding("UTF-8");
 		Map<String, Object> dataMap = new HashMap<String, Object>();
         try {
-        	WordWithBLOBs wwbs = wordService.findWord(38);
+        	WordWithBLOBs wwbs = wordService.getWordWithBLOBs(38);
         	if(wwbs != null) {
         		dataMap.put("functionsol", wwbs.getFunctionsol());
         	}
@@ -316,7 +317,7 @@ public class CreateWordTest extends TestCase {
         configuration.setDefaultEncoding("UTF-8");
 		Map<String, Object> dataMap = new HashMap<String, Object>();
         try {
-        	WordWithBLOBs wwbs = wordService.findWord(38);
+        	WordWithBLOBs wwbs = wordService.getWordWithBLOBs(38);
         	if(wwbs != null) {
         		dataMap.put("idealsol", wwbs.getIdealsol());
         		dataMap.put("techsol", wwbs.getTechsol());
@@ -426,7 +427,7 @@ public class CreateWordTest extends TestCase {
         configuration.setDefaultEncoding("UTF-8");
 		Map<String, Object> dataMap = new HashMap<String, Object>();
         try {
-        	WordWithBLOBs wwbs = wordService.findWord(38);
+        	WordWithBLOBs wwbs = wordService.getWordWithBLOBs(38);
         	List<Map<String,Object>> list = new ArrayList<Map<String,Object>>(); 
         	if(wwbs != null) {
         		for(int i=0;i<8;i++) {
@@ -471,6 +472,370 @@ public class CreateWordTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+	}
+	
+	@Test
+	public void TestCreateWord() {
+		ApplicationContext context = new ClassPathXmlApplicationContext("classpath:beans.xml");
+		AllService allService = (AllService) context.getBean("allService");
+        this.ConfigWord(allService);
+	}
+	
+	public void ConfigWord(AllService allService) {
+		try {
+			int wordId = 38;
+			Map<String, Object> dataMap = new HashMap<String, Object>();
+        	configuration = new Configuration();
+            configuration.setDefaultEncoding("UTF-8");
+        	dataMap = allService.saveAll(wordId);
+        	
+    		configuration.setClassForTemplateLoading(this.getClass(), "/"); // FTL文件所存在的位置
+            Template template = configuration.getTemplate("template.ftl");
+
+            String filePath = Proper.getRealPath() + "/images/word" + wordId + "/word.doc";
+            File outFile = new File(filePath);
+            Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile),"UTF-8"));
+            template.process(dataMap, out);
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+	}
+	
+	/*public void saveAll(AllService allService, Map<String, Object> dataMap, int wordId) {
+		WordWithBLOBs wwbs = allService.getWordService().getWordWithBLOBs(wordId);
+    	this.saveProblemDesc(dataMap, wordId);
+    	this.saveSolution(wwbs, dataMap, wordId);
+    	this.saveNinescreen(allService.getSystemAnalService(), dataMap, wordId);
+    	this.saveLife(dataMap, wordId);
+    	this.saveSource(allService.getSystemAnalService(), dataMap, wordId);
+    	this.saveFunction(allService.getSystemAnalService(), dataMap, wordId);
+		this.saveIdealResult(allService.getSolveProblemService(), dataMap, wordId);
+    	this.saveTechnology(allService.getSolveProblemService(), dataMap, wordId);
+    	this.savePhysical(allService.getSolveProblemService(), dataMap, wordId);
+    	this.saveObjectField(allService.getSolveProblemService(), dataMap, wordId);
+    	this.saveEvaluation(wwbs, dataMap, wordId);  
+	}
+	
+	public void saveEvaluation(WordWithBLOBs wwbs, Map<String, Object> dataMap, int wordId) {
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>(); 
+    	if(wwbs != null) {
+    		for(int i=0;i<8;i++) {
+				Map<String,Object> map = new HashMap<String,Object>();
+				switch(i+1) {
+				case 1:map.put("sol", wwbs.getCausalsol());
+					break;
+				case 2:map.put("sol", wwbs.getNinesol());
+				break;
+				case 3:map.put("sol", wwbs.getResourcesol());
+				break;
+				case 4:map.put("sol", wwbs.getFunctionsol());
+				break;
+				case 5:map.put("sol", wwbs.getIdealsol());
+				break;
+				case 6:map.put("sol", wwbs.getTechsol());
+				break;
+				case 7:map.put("sol", wwbs.getPhysol());
+				break;
+				case 8:map.put("sol", wwbs.getObjsol());
+				break;
+				}
+				map.put("img", this.getImageStr("F:/Java/tomcat9.0.0.M11/webapps/AidInnovation/images/word" + wordId + "/SummerImg" + (i+1) + ".png"));
+//				map.put("sol", wwbs.getCausalsol());
+				list.add(map);
+			}
+    		dataMap.put("eva", list);
+        	
+    	}
+	}
+	
+	public void saveObjectField(SolveProblemService solveProblemService, Map<String, Object> dataMap, int wordId) {
+		List<ObjFieldWithBLOBs> ofs = solveProblemService.findObjectField(wordId);
+		String[] name = new String[]{"不完整模型","有害效应的完整模型","效应不足的完整模型"};
+		String[] desc = new String[]{"是第一类模型，不完整模型，有一个一般解法","是第二类模型，有害效应的完整模型，有两个一般解法","是第三类模型，效应不足的完整模型，有三个一般解法"};
+		String[][] ofDesc = new String[][]{{"一般解法1：补齐所缺失的元素，增加场F或工具S2，完整模型。"},{"一般解法2：加入第3种物质S3，S3用来阻止有害作用。S3可以是通过S1或S2改变而来，或者是S1/S2共同改变而来。","一般解法3：增加另外一个场F2来抵消原来有害场F的效应。"},{"一般解法4：用另一个场F2（或者F2和S3一起）代替原来的场F1（或者F1和S2一起）。","一般解法5：增加另外一个场F2来强化有用的效应。","一般解法6：插进一个物质S3并加上另一个场F2来提高有用效应。"}};
+		if(ofs.size() > 0) {
+			ObjFieldWithBLOBs of = ofs.get(0);
+			dataMap.put("name", name[of.getType()-1]);
+			dataMap.put("text", of.getTxt());
+			dataMap.put("desc", desc[of.getType()-1]);
+			dataMap.put("model0Img", this.getImageStr("F:/Java/tomcat9.0.0.M11/webapps/AidInnovation/images/word" + wordId + "/objectImg0.png"));
+			List<Map<String,Object>> list = new ArrayList<Map<String,Object>>(); 
+			
+			for(int i=0;i<of.getType();i++) {
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("desc", ofDesc[of.getType()-1][i]);
+				map.put("modelImg", this.getImageStr("F:/Java/tomcat9.0.0.M11/webapps/AidInnovation/images/word" + wordId + "/objectImg" + (i+1) + ".png"));
+				switch(i+1) {
+				case 1: map.put("txt", of.getExplain1());
+				break;
+				case 2:map.put("txt", of.getExplain2());
+				break;
+				case 3:map.put("txt", of.getExplain3());
+				break;
+				}
+				list.add(map);
+			}
+			dataMap.put("modelList", list);
+		}
+	}
+	
+	public void savePhysical(SolveProblemService solveProblemService, Map<String, Object> dataMap, int wordId) {
+		List<Physical> phys = solveProblemService.findPhy(wordId);
+		if(phys.size() > 0) {
+			Physical phy = phys.get(0);
+			dataMap.put("text1", phy.getTxt1());
+			dataMap.put("text2", phy.getTxt2());
+			dataMap.put("text3", phy.getTxt3());
+			dataMap.put("text4", phy.getTxt4());
+			dataMap.put("text5", phy.getTxt5());
+			dataMap.put("text6", phy.getTxt6());
+			dataMap.put("space", phy.getSpace());
+			dataMap.put("time", phy.getTim());
+			dataMap.put("phy_condition", phy.getCond());
+			dataMap.put("part", phy.getWhole());
+		}
+	}
+	
+	public void saveTechnology(SolveProblemService solveProblemService, Map<String, Object> dataMap, int wordId) {
+		List<Tech> tech = solveProblemService.findtech(wordId);
+		String[] aqslPara = {"1、运动物体的重量","2、静止物体的重量","3、运动物体的长度","4、静止物体的长度","5、运动物体的面积","6、静止物体的面积","7、运动物体的体积","8、静止物体的体积","9、速度","10、力","11、应力或压力","12、形状","13、结构的稳定性","14、强度","15、运动物体作用时间","16、静止物体作用时间","17、温度","18、光照度","19、运动物体的能量","20、静止物体的能量","21、功率","22、能量损失","23、物质损失","24、信息损失","25、时间损失","26、物质或事物的数量","27、可靠性","28、测试精度","29、制造精度","30、物体外部有害因素作用的敏感性","31、物体产生的有害因素因素","32、可制造性","33、可操作性","34、可维修性","35、适应性及多用性","36、装置的复杂性","37、监控与测试的困难程度","38、自动化程度","39、生产率"};
+		if(tech.size()>0) {
+			Tech t = tech.get(0);
+			dataMap.put("A1", t.getA1());
+			dataMap.put("A2", t.getA2());
+			dataMap.put("B1", t.getB1());
+			dataMap.put("B2", t.getB2());
+			dataMap.put("C1", t.getC1());
+			dataMap.put("C2", t.getC2());
+			dataMap.put("tech_con", ("EC-" + t.getTechCon()));
+			dataMap.put("com1", t.getCom1());
+			dataMap.put("com2", t.getCom2());
+			dataMap.put("com3", t.getCom3());
+			dataMap.put("improve", aqslPara[t.getImprove()-1]);
+			dataMap.put("worse", aqslPara[t.getWorse()-1]);
+			List<Principle> prins = solveProblemService.getMatrixPrinciple(t);
+			String prinStr = "";
+			for(int i=0;i<prins.size();i++) {
+				prinStr += prins.get(i).getId() + "、" + prins.get(i).getName();
+			}
+			
+			dataMap.put("principles", prinStr);
+		}
+	}
+	
+	public void saveIdealResult(SolveProblemService solveProblemService, Map<String, Object> dataMap, int wordId) {
+		List<IdealRes> irs = solveProblemService.findIdealRes(wordId);
+		if(irs.size()>0) {
+			IdealRes ir = irs.get(0);
+			dataMap.put("aim", ir.getAim());
+			dataMap.put("result", ir.getResult());
+			dataMap.put("obstacle", ir.getObstacle());
+			dataMap.put("obs_res", ir.getObsRes());
+			dataMap.put("condition", ir.getCond());
+			dataMap.put("resource", ir.getResource());
+		}
+	}
+	
+	public void saveFunction(SystemAnalService systemAnalService, Map<String, Object> dataMap, int wordId) {
+		List<Function> funs = systemAnalService.findFunction(wordId);
+    	String comStr = "";
+    	if(funs.size() > 0) {
+			Function fun = funs.get(0);
+			dataMap.put("fun_system", fun.getSystem());
+        	dataMap.put("fun_function", fun.getFunction());
+        	dataMap.put("fun_component", fun.getComponent());
+        	comStr = fun.getComponent();
+		}
+    	String[] com = comStr.split("，");
+    	List<List<String>> com1 = new ArrayList<List<String>>();
+    	
+    	for(int i=0;i<=com.length;i++) {
+    		List<String> arry = new ArrayList<String>();
+    		for(int j=0;j<=com.length;j++) {
+    			if(i == 0) {
+    				arry.add(j==0?"":com[j-1]);
+    			} else {
+    				if(j == 0) {
+    					arry.add(com[i-1]);
+    				} else {
+    					arry.add(" ");
+    				}
+    			}
+    		}
+    		com1.add(arry);
+    	}
+    	
+//    	int com1Length = com1.size();        	
+    	int length = 9;
+		int total = 9854;
+		List<String> lengthList = new ArrayList<String>();
+		lengthList.add(((int)(total - Math.floor(total/length)*8)) + "");
+		for(int i=0;i<length-1;i++) {
+			lengthList.add((int)Math.floor(total/length) + "");
+		}
+    	dataMap.put("com1length", lengthList);
+    	
+    	
+    	
+    	List<ComFun> comfuns = systemAnalService.finComFun(wordId);
+    	List<Map<String,Object>> com2List = new ArrayList<Map<String,Object>>(); 
+    	String[] para = new String[]{"有益","有害"};
+    	String[] level = new String[]{"适当","不足","过度"};
+		for(int i=0;i<comfuns.size();i++) {
+			int y = 0;
+			int x = 0;
+			ComFun cf = comfuns.get(i);
+			Map<String,Object> map = new HashMap<String,Object>();  
+			map.put("id", i+1);
+			map.put("precom", cf.getPrename());
+			map.put("fun", cf.getFunction());
+			map.put("lastcom", cf.getAftername());
+			map.put("para", cf.getPara());
+			map.put("type", para[cf.getType()-1]);
+			map.put("level", level[cf.getLevel()-1]);
+			for(int j=0;j<com.length;j++) {
+				if(cf.getPrename().equals(com[j])) {
+					x = j;
+				}
+				if(cf.getAftername().equals(com[j])) {
+					y = j;
+				}
+			}
+			if(x != y) {
+				com1.get(x+1).set(y+1, "+");
+			}
+			
+            com2List.add(map); 
+		}
+
+    	dataMap.put("com1out", com1);
+		dataMap.put("com2out", com2List); 
+		dataMap.put("funImg", this.getImageStr("F:/Java/tomcat9.0.0.M11/webapps/AidInnovation/images/word" + wordId + "/funImg.png"));
+	}
+	
+	public void saveSource(SystemAnalService systemAnalService, Map<String, Object> dataMap, int wordId) {
+		List<Source> sources = systemAnalService.findSource(wordId);
+    	List<Map<String,Object>> resourceList = new ArrayList<Map<String,Object>>(); 
+    	String[][] table1 = new String[3][6];
+    	String[] table2 = new String[12];
+    	for(int m=0;m<table1.length;m++) {
+			for(int n=0;n<table1[m].length;n++) {
+				table1[m][n] = ""; 
+			}
+		}
+		for(int m=0;m<table2.length;m++) {
+			table2[m] = ""; 
+		}
+    	String[] txt = {"免费","廉价","昂贵","无限","足够","不足","有益","中性","有害","成品","改变可用","需要建造"};
+    	if(sources.size() > 0) {
+			for(int i=0;i<sources.size();i++) {
+				Source source = sources.get(i);
+				int value = Integer.parseInt(source.getValue());
+				int quantity = Integer.parseInt(source.getQuantity());
+				int quality = Integer.parseInt(source.getQuality());
+				int usable = Integer.parseInt(source.getUsable());
+				int sys = Integer.parseInt(source.getSystem());
+				int type = Integer.parseInt(source.getType());
+				table1[sys-1][type-1] += (source.getName() + ",");
+				table2[value-1] += (source.getName() + ",");
+				table2[quantity+2] += (source.getName() + ",");
+				table2[quality+5] += (source.getName() + ",");
+				table2[usable+8] += (source.getName() + ",");
+				for(int m=0;m<table1.length;m++) {
+					for(int n=0;n<table1[m].length;n++) {
+						dataMap.put("table"+(m+1)+(n+1), table1[m][n]); 
+					}
+				}
+				for(int m=0;m<table2.length;m++) {
+					dataMap.put("table4"+(m+1), table2[m]); 
+				}
+				Map<String,Object> map = new HashMap<String,Object>();  
+				map.put("name", source.getName());
+				map.put("value", txt[value-1]);
+				map.put("quantity", txt[value+2]);
+				map.put("quality", txt[value+5]);
+				map.put("usable", txt[value+8]);
+				resourceList.add(map);  
+                dataMap.put("res", resourceList); 
+			}
+		}
+	}
+	
+	public void saveLife(Map<String, Object> dataMap, int wordId) {
+		dataMap.put("lifeImg", this.getImageStr("F:/Java/tomcat9.0.0.M11/webapps/AidInnovation/images/word" + wordId + "/lifeImg.png"));
+	}
+	
+	public void saveNinescreen(SystemAnalService systemAnalService, Map<String, Object> dataMap, int wordId) {
+		List<Ninescreen> nss = systemAnalService.getNineScreens(wordId);
+    	String[] screen = new String[9];
+    	for(int i=0;i<nss.size();i++) {
+    		Ninescreen ns = nss.get(i);
+    		int index = Integer.parseInt(ns.getName().substring(6));
+    		screen[index-1] = ns.getTxt();
+    	}
+    	for(int i=0;i<screen.length;i++) {
+    		dataMap.put("screen"+(i+1), screen[i]);
+    	}
+	}
+	
+	public void saveSolution(WordWithBLOBs wwbs, Map<String, Object> dataMap, int wordId) {
+    	if(wwbs != null) {
+    		dataMap.put("causalsol", wwbs.getCausalsol());
+    		dataMap.put("ninesol", wwbs.getNinesol());
+    		dataMap.put("lifesol", wwbs.getLifesol());
+    		dataMap.put("resourcesol", wwbs.getResourcesol());
+    		dataMap.put("functionsol", wwbs.getFunctionsol());
+    		dataMap.put("idealsol", wwbs.getIdealsol());
+    		dataMap.put("techsol", wwbs.getTechsol());
+    		dataMap.put("physol", wwbs.getPhysol());
+    		dataMap.put("objsol", wwbs.getObjsol());
+    		dataMap.put("finalsolution", wwbs.getFinalsol());
+			dataMap.put("principleImg", this.getImageStr("F:/Java/tomcat9.0.0.M11/webapps/AidInnovation/images/word" + wordId + "/cauImg.png"));
+			dataMap.put("causalImg", this.getImageStr("F:/Java/tomcat9.0.0.M11/webapps/AidInnovation/images/word" + wordId + "/cauImg.png"));
+    	}
+	}
+	
+	public void saveProblemDesc(Map<String, Object> dataMap, int wordId) {
+		ProblemDescrWithBLOBs pdwb = problemDescrService.checkWordId(wordId);
+		if(pdwb != null) {
+			dataMap.put("source", pdwb.getSource());
+			dataMap.put("descr", pdwb.getDescr());
+			dataMap.put("function", pdwb.getFun());
+			dataMap.put("component", pdwb.getComponent());
+			dataMap.put("principle", pdwb.getPrinciple());
+			dataMap.put("problem", pdwb.getProblem());
+			dataMap.put("parameter", pdwb.getParameter());
+			dataMap.put("goal", pdwb.getGoal());
+			dataMap.put("limit", pdwb.getLim());
+			dataMap.put("exist", pdwb.getExist());
+		} else {
+			dataMap.put("source", "");
+			dataMap.put("descr", "");
+			dataMap.put("function", "");
+			dataMap.put("component", "");
+			dataMap.put("principle", "");
+			dataMap.put("problem", "");
+			dataMap.put("parameter", "");
+			dataMap.put("goal", "");
+			dataMap.put("limit", "");
+			dataMap.put("exist", "");
+		}
+	}*/
+	
+	@Test
+	public void testCom1Length() {
+		int length = 9;
+		int total = 9854;
+		List<String> list = new ArrayList<String>();
+		list.add(((total - Math.floor(total/length)*8)) + "");
+		for(int i=0;i<length-1;i++) {
+			list.add(Math.floor(total/length) + "");
+		}
+		
+		for(String l:list) {
+			System.out.println(l);
+		}
 	}
 	
 	private String getImageStr(String path) {

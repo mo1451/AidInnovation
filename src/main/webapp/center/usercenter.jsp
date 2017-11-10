@@ -14,9 +14,16 @@
 <meta name="renderer" content="webkit">
 <title>用户中心</title>
 <link rel="stylesheet" href="../css/pintuer.css">
-
 <link rel="stylesheet" href="../css/admin.css">
 <script src="../js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#createNewWord").click(function() {
+		//	alert("createWord?userId=${userId}&username=${username }");
+			window.parent.frames.location.href="createWord?userId=${userId}&username=${username }";
+		});
+	});
+</script>
 </head>
 <body style="background-color:#f2f9fd;">
 	<div class="header bg-main">
@@ -25,7 +32,6 @@
 		</div>
 		<div class="head-l text-white" style="padding-top:10px;margin-left:30px;">
 			欢迎您！
-			<c:if test="${user != null }">${user.name }</c:if>
 			<c:if test="${username != null }">${username }</c:if>
 			</a>。
 		</div>
@@ -40,31 +46,33 @@
 		<div class="leftnav-title">
 			<strong><span class="icon-list"></span>用户管理</strong>
 		</div>
-		<h2 id="basicInfo">
-			<span class="icon-pencil-square-o"></span><a href="userInfo?userId=${user.id }${userId}" target="right">用户信息</a>
+		<h2 class="basicInfo">
+			<span class="icon-pencil-square-o"></span><a href="userInfo?userId=${userId}" target="right">用户信息</a>
 		</h2>
-		<h2 id="basicInfo">
+		<h2 class="basicInfo">
 			<span class="icon-pencil-square-o"></span><a href="changePassword" target="right">修改密码</a>
 		</h2>
-		<h2 id="basicInfo">
-			<span class="icon-pencil-square-o"></span><a href="createWord?userId=${userId}${ user.id}&username=${username }${user.name}" target="_top">新建文档</a>
+		<h2 class="basicInfo">
+			<span class="icon-pencil-square-o"></span><a href="javascript:void(0);" target="_top" id="createNewWord">新建文档</a>
 		</h2>
-		<h2 id="basicInfo">
-			<span class="icon-pencil-square-o"></span><a href="historyWord" target="right">历史文档</a>
+		<h2 class="basicInfo">
+			<span class="icon-pencil-square-o"></span><a href="historyWord?userId=${userId}&username=${username }" target="right">历史文档</a>
 		</h2>		
-	</div>
+
+</div>
+	
 	<script type="text/javascript">
 		$(function() {
-			$("#basicInfo").click(function() {
+			$(".basicInfo").click(function() {
 				$("#a_leader_txt").text($(this).text());
 			})
 		});
 	</script>
 	<ul class="bread">
-		<li><a href="##" id="a_leader_txt" class="icon-home">用户信息</a></li>
+		<li><a href="##" id="a_leader_txt" class="icon-home">历史文档</a></li>
 	</ul>
 	<div class="admin">
-		<iframe scrolling="auto" rameborder="0" src="userInfo?userId=${user.id }${userId}" name="right"
+		<iframe scrolling="auto" rameborder="0" src="historyWord?userId=${userId}&username=${username }" name="right"
 			width="100%" height="100%"></iframe>
 	</div>
 	<div style="text-align:center;"></div>

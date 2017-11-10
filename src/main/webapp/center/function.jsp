@@ -68,129 +68,219 @@
 		%>
 		
 		canvas = document.getElementById('canvas'); 
+		CanvasRenderingContext2D.prototype.wrapText = function(str,x,y){
+         //   var index = str.indexOf('-');
+            var textArray = str.split('-');
+         //   str2= str.substr(index+1,str.length);
+         //   str1= str.substr(0,index);
+		//    var textArray = new Array(str1,str2);
+		    if(textArray==undefined||textArray==null)return false;
+		    var rowCnt = textArray.length;
+		    var i = 0,imax  = rowCnt,maxLength = 0;maxText = textArray[0];
+		    for(;i<imax;i++){
+		        var nowText = textArray[i],textLength = nowText.length;
+		        if(textLength >=maxLength){
+		            maxLength = textLength;
+		            maxText = nowText;
+		        }
+		    }
+		    var maxWidth = this.measureText(maxText).width;
+		    var lineHeight = this.measureText("元").width;
+		    x+= lineHeight*(rowCnt-1)*1.7;
+		    for(var j= 0;j<textArray.length;j++){
+		        var words = textArray[j];
+		        this.fillText(words,x,y-textArray.length*lineHeight/2);
+		     //   this.fillText(words,x,y);
+		        y+= lineHeight;
+		    }
+		};
         stage = new JTopo.Stage(canvas); // 创建一个舞台对象
         scene = new JTopo.Scene(stage); // 创建一个场景对象
-        scene.background = '../images/chartback.jpg';
-		/* $("#function").delegate("#createcom","click",function() {
-			$("#comtable").remove();
-			$("#combtn").remove();
-			var text = $("#component").val();
-			var tablestr = "<table class='table' style='margin:auto;text-align:center;margin-top:40px;' id='comtable'>"
-						+ "<tr><th colspan='7' style='text-align:center;' class='success'>组成部分</th></tr>"
-						;
-			textsplit = text.split("，");
-	//		alert(textsplit);
-			var countcol = 0;
-			var countrow = 0;
-			for(var i=0;i<textsplit.length+1;i++) {
-				tablestr += "<tr>";
-				for(var j=0;j<textsplit.length+1;j++) {
-					if(i==0 && j!=0) {
-						tablestr += "<td style='vertical-align:middle;'>" + textsplit[j-1] + "</td>";
-					} else if(i!=0 && j==0) {
-						tablestr += "<td style='vertical-align:middle;'>" + textsplit[i-1] + "</td>";
-					} else if(i==0 && j==0) {
-						tablestr += "<td style='vertical-align:middle;'></td>";
-					} else if(i<=j) {
-						tablestr += "<td style='vertical-align:middle;background:grey;'></td>";
-					} else {
-						tablestr += "<td style='vertical-align:middle;'>" 
-								+ "<select name='relative' id='relsel" + i + j + "' class='form-control relsel'>"
-								+ "<option value='notrelative' selected>无关</option>"
-								+ "<option value='" + textsplit[i-1] + "," + textsplit[j-1] + "'>有关</option>"						
-					    		+ "</select></td>";
-					}
-				}
-				tablestr += "</tr>";
-			}
-			tablestr += "</table>"
-					+ "<div class='form-group' id='combtn'  style='margin-top:40px;margin-left:40px;text-align:center;'>"
-					+ "<div class='col-sm-2' style='margin:0 auto;'>"
-					+ "<button class='btn btn-default' type='button' id='createfun'>生成功能表格</button>"
-					+ "</div></div>";
-			$("#componentdiv").after(tablestr);
-		});
-		
-		
-		$("#function").delegate("#createfun","click",function() {
-			$("#funtable").remove();
-			$("#funbtn").remove();
-			var tablestr = "<table class='table' style='margin:auto;text-align:center;margin-top:40px;' id='funtable'>"
-						+ "<tr><th colspan='7' style='text-align:center;' class='success'>组成相互作用</th></tr>"
-						;
-			var seltext = new Array();
-			var countsel = 0;
-			$(".relsel option:selected").each(function(selindex,selitem) {
-		//		alert($(this).val());
-				var selval = $(selitem).val();
-				if(selval != "notrelative") {
-					seltext[countsel++] =selval.split(",");
-				}				
-		//		alert(seltext.length);
-			});  
-			var rowtext = new Array("功能","功能载体","作用","功能对象","改变参数","功能种类","实现水平");
-			for(var i=0;i<seltext.length+1;i++) {
-				if(i==0) {
+  //      scene.background = '../images/chartback.jpg';
+		$("#function").delegate("#createcom","click",function() {
+			$.ajax({
+				type: 'post',
+				url : '${pageContext.request.contextPath}/center/ComJson',  
+	            data: 'wordId=' + ${wordId},  
+	            async : false, //同步方式  
+	            success : function(pos) {   
+	          //  	alert(pos);
+	          //  	alert(txt.length);
+	            	createCom(pos);
+	            }
+			});
+			function createCom(pos) {
+				$("#comtable").remove();
+				$("#combtn").remove();
+				var text = $("#component").val();
+				var tablestr = "<table class='table' style='margin:auto;text-align:center;margin-top:40px;' id='comtable'>"
+							+ "<tr><th colspan='7' style='text-align:center;' class='success'>组成部分</th></tr>"
+							;
+				var textsplit = text.split("，");
+		//		alert(textsplit);
+				var countcol = 0;
+				var countrow = 0;
+				for(var i=0;i<textsplit.length+1;i++) {
 					tablestr += "<tr>";
-					for(var j=0;j<rowtext.length;j++) {
-						tablestr += "<td style='vertical-align:middle;'>" + rowtext[j] + "</td>";							
+					for(var j=0;j<textsplit.length+1;j++) {
+						var select1 = "selected";
+						var select2 = "";
+						for(var m=0;m<pos.length;m++) {
+							if((i) == pos[m][0] && (j) == pos[m][1]) {
+								select1 = "";
+								select2 = "selected";
+							}
+						}
+						if(i==0 && j!=0) {
+							tablestr += "<td style='vertical-align:middle;'>" + textsplit[j-1] + "</td>";
+						} else if(i!=0 && j==0) {
+							tablestr += "<td style='vertical-align:middle;'>" + textsplit[i-1] + "</td>";
+						} else if(i==0 && j==0) {
+							tablestr += "<td style='vertical-align:middle;'></td>";
+						} else if(i==j) {
+							tablestr += "<td style='vertical-align:middle;background:grey;'></td>";
+						} else {
+							tablestr += "<td style='vertical-align:middle;'>" 
+									+ "<select name='relative' id='relsel" + i + j + "' class='form-control relsel' " + (select1==""?"style='background-color:yellow;'":"") + ">"
+									+ "<option value='notrelative' " + select1 + ">无关</option>"
+									+ "<option value='" + textsplit[i-1] + "," + textsplit[j-1] + "' " + select2 + ">有关</option>"						
+						    		+ "</select></td>";
+						}
 					}
 					tablestr += "</tr>";
-				} else {
-					tablestr += "<tr><td style='vertical-align:middle;'>" + (i*2-1) +"</td>" 
-						+ "<input type='hidden' name='preAfter' id='preAfter' value='" + seltext[i-1][0] + "," + seltext[i-1][1] + "'>"
-						+ "<td style='vertical-align:middle;'>" + seltext[i-1][0] + "</td>"
-						+ "<td style='vertical-align:middle;'><input type='text' class='form-control text-center' name='func' value=''></td>"
-						+ "<td style='vertical-align:middle;'>" + seltext[i-1][1] + "</td>"
-						+ "<td style='vertical-align:middle;'><input type='text' class='form-control text-center' name='para' value=''></td>"
-						+ "<td style='vertical-align:middle;'>"
-							+ "<select class='form-control funsel' name='funtype'>"
-							+ "<option value='1' selected>有益</option>"
-							+ "<option value='2'>有害</option>"						
-				    		+ "</select>"
-				    	+ "</td>"
-						+ "<td style='vertical-align:middle;'>"
-							+ "<select class='form-control funsel' name='level'>"
-							+ "<option value='1' selected>适当</option>"
-							+ "<option value='2'>不足</option>"
-							+ "<option value='3'>过度</option>"
-				    		+ "</select>"
-						+ "</td></tr>";
-						
-					tablestr += "<tr><td style='vertical-align:middle;'>" + (i*2) +"</td>" 
-						+ "<input type='hidden' name='preAfter' id='preAfter' value='" + seltext[i-1][1] + "," + seltext[i-1][0] + "'>"
-						+ "<td style='vertical-align:middle;'>" + seltext[i-1][1] + "</td>"
-						+ "<td style='vertical-align:middle;'><input type='text' class='form-control text-center' name='func' value=''></td>"
-						+ "<td style='vertical-align:middle;'>" + seltext[i-1][0] + "</td>"
-						+ "<td style='vertical-align:middle;'><input type='text' class='form-control text-center' name='para' value=''></td>"
-						+ "<td style='vertical-align:middle;'>"
-							+ "<select class='form-control funsel' name='funtype'>"
-							+ "<option value='1' selected>有益</option>"
-							+ "<option value='2'>有害</option>"						
-				    		+ "</select>"
-				    	+ "</td>"
-						+ "<td style='vertical-align:middle;'>"
-							+ "<select class='form-control funsel' name='level'>"
-							+ "<option value='1' selected>适当</option>"
-							+ "<option value='2'>不足</option>"
-							+ "<option value='3'>过度</option>"
-				    		+ "</select>"
-						+ "</td></tr>";
 				}
+				tablestr += "</table>"
+						+ "<div class='form-group' id='combtn'  style='margin-top:40px;margin-left:40px;text-align:center;'>"
+						+ "<div class='col-sm-2' style='margin:0 auto;'>"
+						+ "<button class='btn btn-default' type='button' id='createfun'>生成功能表格</button>"
+						+ "</div></div>";
+				$("#componentdiv").after(tablestr);
 			}
-			tablestr += "</table>"
-					+ "<div class='form-group' id='funbtn'  style='margin-top:40px;margin-left:40px;text-align:center;'>"
-					+ "<div class='col-sm-2' style='margin:0 auto;'>"
-					+ "<button class='btn btn-default' type='button' id='createchart'>生成流程图</button>"
-					+ "</div></div>";
-			$("#combtn").after(tablestr);
+		//	alert($(".relsel").first().attr("name"));
 		});
-		 */
+		
+		$("#function").on("change",".relsel", function() {
+		//	alert($(this).children("option:last").val());
+			if($(this).val() == "notrelative") {
+			//	alert();
+				$(this).css("background-color","white");
+			} else {
+				$(this).css("background-color","yellow");
+			}	
+		
+		
+			/* $.ajax({
+				type: 'post',
+				url: '${pageContext.request.contextPath}/center/ComChangeJson',
+				data: 'wordId=' + ${wordId} + "&val=" + $(this).val() + "&txt=" + $(this).children("option:last").val(),
+				async: false,
+				success: function() {
+					
+				}
+			}); */
+			//alert("1");
+			
+		});
+		/* $("#function").delegate(".relsel","change",function() {
+			alert(2);
+		}); */
+		
+		$("#function").delegate("#createfun","click",function() {
+			var countsel = 0;
+			var seltext = new Array();
+			$(".relsel option:selected").each(function(selindex,selitem) {
+			//		alert($(this).val());
+					var selval = $(selitem).val();
+					if(selval != "notrelative") {
+						seltext[countsel++] =selval.split(",");
+					}				
+			//		alert(seltext.length);
+				});  
+			$.ajax({
+				type: 'post',
+				url: '${pageContext.request.contextPath}/center/FunJson',
+				contentType : 'application/json',
+				data: "{\"wordId\":\"" + ${wordId} + "\",\"seltext\":\"" + seltext +"\"}",
+				dataType: 'json',
+				async: false,
+				success: function(txt) {
+					createFun(txt);
+				}
+			});
+			function createFun(txt) {
+				$("#funtable").remove();
+				$("#funbtn").remove();
+				
+				var tablestr = "<table class='table' style='margin:auto;text-align:center;margin-top:40px;' id='funtable'>"
+							+ "<tr><th colspan='7' style='text-align:center;' class='success'>组成相互作用</th></tr>"
+							;
+				
+				
+				var rowtext = new Array("功能","功能载体","作用","功能对象","改变参数","功能种类","实现水平");
+				for(var i=0;i<seltext.length+1;i++) {
+					if(i==0) {
+						tablestr += "<tr>";
+						for(var j=0;j<rowtext.length;j++) {
+							tablestr += "<td style='vertical-align:middle;'>" + rowtext[j] + "</td>";							
+						}
+						tablestr += "</tr>";
+					} else {
+						tablestr += "<tr><td style='vertical-align:middle;'>" + (i) +"</td>" 
+							+ "<input type='hidden' name='preAfter' id='preAfter' value='" + seltext[i-1][0] + "," + seltext[i-1][1] + "'>"
+							+ "<td style='vertical-align:middle;'>" + seltext[i-1][0] + "</td>"
+							+ "<td style='vertical-align:middle;'><input type='text' class='form-control text-center' name='func' value='" + txt[i-1][0] + "'></td>"
+							+ "<td style='vertical-align:middle;'>" + seltext[i-1][1] + "</td>"
+							+ "<td style='vertical-align:middle;'><input type='text' class='form-control text-center' name='para' value='" + txt[i-1][1] + "'></td>"
+							+ "<td style='vertical-align:middle;'>"
+								+ "<select class='form-control funsel' name='funtype'>"
+								+ "<option value='1' " + (txt[i-1][2]=="1"?"selected":"") + ">有益</option>"
+								+ "<option value='2' " + (txt[i-1][2]=="2"?"selected":"") + ">有害</option>"						
+					    		+ "</select>"
+					    	+ "</td>"
+							+ "<td style='vertical-align:middle;'>"
+								+ "<select class='form-control funsel' name='level'>"
+								+ "<option value='1' " + (txt[i-1][3]=="1"?"selected":"") + ">适当</option>"
+								+ "<option value='2' " + (txt[i-1][3]=="2"?"selected":"") + ">不足</option>"
+								+ "<option value='3' " + (txt[i-1][3]=="3"?"selected":"") + ">过度</option>"
+					    		+ "</select>"
+							+ "</td></tr>";
+					}
+				}
+				tablestr += "</table>"
+						+ "<div class='form-group' id='funbtn'  style='margin-top:40px;margin-left:40px;text-align:center;'>"
+						+ "<div class='col-sm-2' style='margin:0 auto;'>"
+						+ "<button class='btn btn-default' type='button' id='createchart'>生成流程图</button>"
+						+ "</div>"
+						+ "<div class='col-sm-2' style='margin:0 auto;'>"
+						+ "<button class='btn btn-default' type='button' id='savechart'>保存流程图</button>"
+						+ "</div></div>";
+				$("#combtn").after(tablestr);
+			}
+			
+		});
+		
+		$("#function").on("click","#savechart",function() {
+			var c = document.getElementById("canvas");
+			var dataURL = c.toDataURL("image/png");
+			var imageData = dataURL.substring(22);
+			$.ajax({  
+	            type : 'post',  
+	            url : '${pageContext.request.contextPath}/center/FunImgJson',  
+	            data: 'dataURL=' + imageData + '&wordId=' + ${wordId},  
+	            async : false, //同步方式  
+	            success : function() {   
+	            	alert("保存成功！");
+	            }  
+		    });  
+		});
+		 
 		$("#function").delegate("#createchart","click",function() {
 			var chartext = new Array();
 			var charcount = 0;			
 			var bule = "0,0,255";
 			var red = "255,0,0";
+			var comTextStr = $("#component").val();
+			var comText = comTextStr.split("，");
 			$("#funtable tr").each(function(trindex,tritem) {
 				if(trindex > 1) {
 					chartext[charcount] = new Array();
@@ -206,7 +296,6 @@
 					charcount ++;
 				}
 			});
-		//	alert(chartext[0][4]);
 			$("#showflowchart").css("display","block");
 			scene.clear();
 			
@@ -215,6 +304,8 @@
                 var node = new JTopo.Node(text);
                 node.textPosition = 'Middle_Center';// 文字居中
                 node.setLocation(x, y);
+                node.fontColor = "0,0,0";
+                node.font = "22px Consolas";
                 node.setSize(w, h);
                 scene.add(node);
                 return node;
@@ -225,6 +316,8 @@
                 var link = new JTopo.FoldLink(nodeA, nodeZ, text);
                 link.direction = direction || 'horizontal';
                 link.arrowsRadius = 15; //箭头大小
+                link.fontColor = "0,0,0";
+                link.font = "20px Consolas";
                 link.lineWidth = lineWidth; // 线宽
                 link.bundleOffset = 60; // 折线拐角处的长度
                 link.bundleGap = 20; // 线条之间的间隔
@@ -248,72 +341,44 @@
          	var y = 50;
          	var countNode = 2;
          	var nodeArr = new Array();
-         	var node1 = newNode(x, y, 60, 60, chartext[0][0]);
-     		var node2 = newNode(x+100, y+100, 60, 60, chartext[0][2]);
-     		nodeArr[0] = node1;
-     		nodeArr[1] = node2;
-         	for(var i=0; i < (chartext.length/2); i++) {
-         		var j = 0;
-         		for(j=0;j<nodeArr.length;j++) {
-         			if(nodeArr[j].text == chartext[i*2][0]) {
+         	for(var i=0;i<comText.length;i++) {
+         		
+         		nodeArr[i] = newNode(x,y,80,80,comText[i]);
+         		if(x+250<=800) {
+         			x += 150;
+         		} else {
+         			x = 50;
+         			y += 150; 
+         		}
+         	}
+          	var node1 = nodeArr[0];
+     		var node2 = nodeArr[1];
+         	for(var i=0; i < (chartext.length); i++) {
+         		
+         		for(var j=0;j<nodeArr.length;j++) {
+         			if(nodeArr[j].text==chartext[i][0]) {
+         				node1 = nodeArr[j];
          				break;
          			}
          		}
-         		if(j == nodeArr.length) {
-         			if(x+250<=800) {
-             			x += 150;
-             		} else {
-             			x = 50;
-             			y += 150; 
-             		}
-         			nodeArr[countNode] = newNode(x, y, 60, 60, chartext[i*2][0]);
-         			node1 = nodeArr[countNode];
-         			countNode ++;
-         		} else {
-         			node1 = nodeArr[j];
-         		}
-         		for(j=0;j<nodeArr.length;j++) {
-         			if(nodeArr[j].text == chartext[i*2][2]) {
+         		for(var j=0;j<nodeArr.length;j++) {
+         			if(nodeArr[j].text==chartext[i][2]) {
+         				node2 = nodeArr[j];
          				break;
          			}
          		}
-         		if(j == nodeArr.length) {
-         			if(x+250<=800) {
-             			x += 150;
-             		} else {
-             			x = 50;
-             			y += 150; 
-             		}
-         			nodeArr[countNode] = newNode(x, y, 60, 60, chartext[i*2][0]);
-         			node2 = nodeArr[countNode];
-         			countNode ++;
-         		} else {
-         			node2 = nodeArr[j];
-         		}         		
-         		if(chartext[i*2][4] == "useful") {
-             		if(chartext[i*2][5] == "proper") {
-             			newFoldLink(node1, node2, chartext[i*2][1],3,bule);
-             		} else if(chartext[i*2][5] == "lack") {
-             			newFoldLink(node1, node2, chartext[i*2][1],3,bule,5);
-             		} else if(chartext[i*2][5] == "over") {
-             			newFoldLink(node1, node2, chartext[i*2][1],6,bule);
+         		if(chartext[i][4] == 1) {
+             		if(chartext[i][5] == 1) {
+             			newFoldLink(node1, node2, chartext[i][1],3,bule);
+             		} else if(chartext[i][5] == 2) {
+             			newFoldLink(node1, node2, chartext[i][1],3,bule,5);
+             		} else if(chartext[i][5] == 3) {
+             			newFoldLink(node1, node2, chartext[i][1],6,bule);
              		}
              	} else {                           
-             		newFoldLink(node1, node2, chartext[i*2][1],3,red);
-             	}
-         		if(chartext[i*2+1][4] == "useful") {
-             		if(chartext[i*2+1][5] == "proper") {
-             			newFoldLink(node2, node1, chartext[i*2+1][1],3,bule,'vertical');
-             		} else if(chartext[i*2+1][5] == "lack") {
-             			newFoldLink(node2, node1, chartext[i*2+1][1],3,bule,'vertical',5);
-             		} else if(chartext[i*2+1][5] == "over") {
-             			newFoldLink(node2, node1, chartext[i*2+1][1],6,bule,'vertical');
-             		}
-             	} else {                           
-             		newFoldLink(node2, node1, chartext[i*2+1][1],3,bule,'vertical');
+             		newFoldLink(node1, node2, chartext[i][1],3,red);
              	}
          	}
-       //  	alert();
 		});
 	});
 </script>
@@ -346,10 +411,10 @@
 						<input type="text" class="form-control" id="component" name="component" value="${component }" placeholder="请用，（中文）分离组成">
 					</div>
 					<div class="col-sm-2 reasonbtn">
-						<button class="btn btn-default" type="submit" id="createcom">生成组件表格</button>
+						<button class="btn btn-default" type="button" id="createcom">生成组件表格</button>
 					</div>
 				</div>
-				<% 
+				<%-- <% 
 					
 					if(component != null && !component.equals("")) {
 						String[] com = component.split("，");
@@ -430,14 +495,14 @@
 						out.print(tablestr);
 					}
 					}
-				%>
+				%> --%>
 				<div class="form-group" style="text-align:center;display:none;" id="showflowchart">						
 						<canvas width="850" height="550" id="canvas"></canvas>					
 				</div>
 				<div class="form-group" id="solutiondiv"  style="margin-top:40px;">
 					<label for="solution1" class="col-sm-2 control-label">思路5：</label>
 					<div class="col-sm-8">
-						<textarea class="form-control" rows="4" id="solution5" name="solution5">${solution5 }</textarea>
+						<textarea class="form-control" rows="6" id="solution5" name="solution5">${solution5 }</textarea>
 					</div>
 				</div>
 				

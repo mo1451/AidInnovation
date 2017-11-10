@@ -61,7 +61,7 @@
 	<c:if test="${msg == 'abc' }">
 		<div class="container">
 			<form class="form-signin form-horizontal" role="form"
-				action="changePassword">
+				action="sendChangePasswordEmail">
 				<input type="hidden" name="email" value="${email}">
 				<div class="form-group">
 					<input type="password" class="form-control" name="password"

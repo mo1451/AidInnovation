@@ -22,10 +22,6 @@
 		<div class="head-l text-white" style="padding-top:10px;margin-left:30px;">
 			欢迎您！管理员。
 		</div>
-		<div class="head-l">
-			<a class="button button-little bg-green" href="../main.jsp"><span class="icon-home"></span> 前台首页</a>
-			<a class="button button-little bg-red" href="userout.jsp"><span class="icon-power-off"></span> 退出登录</a>
-		</div>
 	</div>
 	<div class="leftnav" style="height:595px;overflow-y:auto;">
 		<div class="leftnav-title">
@@ -35,12 +31,20 @@
 			<span class="icon-pencil-square-o"></span>用户列表
 		</h2>
 		<ul>
-			<li><a href="userlist.jsp" target="right"><span
+			<li><a href="UserList" target="right"><span
 					class="icon-caret-right"></span>用户列表</a></li>
+					<li><a href="userSearch" target="right"><span
+					class="icon-caret-right"></span>搜索用户</a></li>
+					<li><a href="wordList" target="right"><span
+					class="icon-caret-right"></span>文章列表</a></li>
+					<li><a href="wordSearch" target="right"><span
+					class="icon-caret-right"></span>搜索文章</a></li>
 		</ul>
 	</div>
 	<script type="text/javascript">
 		$(function() {
+			$(".leftnav h2").next().slideToggle(200);
+			$(".leftnav h2").toggleClass("on");
 			$(".leftnav h2").click(function() {
 				$(this).next().slideToggle(200);
 				$(this).toggleClass("on");
@@ -59,7 +63,7 @@
 		<li><a href="##" id="a_leader_txt" class="icon-home">用户列表</a></li>
 	</ul>
 	<div class="admin">
-		<iframe scrolling="auto" rameborder="0" src="userlist.jsp" name="right" width="100%" height="100%"></iframe>
+		<iframe scrolling="auto" rameborder="0" src="UserList" name="right" width="100%" height="100%"></iframe>
 	</div>
 	<div style="text-align:center;"></div>
 </body>

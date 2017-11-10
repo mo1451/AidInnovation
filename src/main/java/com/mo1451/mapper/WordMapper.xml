@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.mo1451.model.Word">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.mo1451.model.WordWithBLOBs">
     <result column="causalsol" jdbcType="LONGVARCHAR" property="causalsol" />
@@ -16,6 +17,13 @@
     <result column="physol" jdbcType="LONGVARCHAR" property="physol" />
     <result column="objsol" jdbcType="LONGVARCHAR" property="objsol" />
     <result column="finalsol" jdbcType="LONGVARCHAR" property="finalsol" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" type="com.mo1451.model.WordSearchResult" id="WordSearchResult">
+  	<association property="user" javaType="com.mo1451.model.User">
+  		<id column="user_id" property="id"/>
+  		<result column="username" property="name"/>
+  		<result column="useremail" property="email"/>
+  	</association>
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -76,7 +84,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, userid
+    id, userid, name
   </sql>
   <sql id="Blob_Column_List">
     causalsol, ninesol, lifesol, resourcesol, functionsol, idealsol, techsol, physol, 
@@ -120,6 +128,38 @@
     from word
     where id = #{id,jdbcType=INTEGER}
   </select>
+  <select id="selectByPage" parameterType="com.mo1451.model.Page" resultMap="BaseResultMap">
+  	select * from word limit #{start,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+  </select>
+   <select id="selectByWordSearch" parameterType="com.mo1451.model.WordSearch" resultMap="WordSearchResult">
+  	select word.*, user.id, user.name, user.email from word 
+  	
+  	join user on (user.id = word.userid)
+  	<where>
+  		<if test="word.id != null">word.id = #{word.id}</if>
+  		<if test="word.name != null">and word.name like '%${word.name}%'</if>
+  	</where>
+  	limit #{page.start,jdbcType=INTEGER},#{page.pageSize,jdbcType=INTEGER}
+  </select>
+  <select id="selectByUserId" parameterType="com.mo1451.model.WordSearch" resultMap="WordSearchResult">
+  	select word.*, user.id, user.name, user.email from word 
+  	join (select * from user where id = #{user.id}) user on (user.id = word.userid)
+  	limit #{page.start,jdbcType=INTEGER},#{page.pageSize,jdbcType=INTEGER}
+  </select>
+  <select id="countAllWords" resultType="java.lang.Integer">
+  	select count(*) from word;
+  </select>
+  <select id="countSearch" parameterType="com.mo1451.model.Word" resultType="java.lang.Integer">
+  	select count(*) from word
+  	<where>
+  		<if test="id != null">id = #{id}</if>
+  		<if test="name != null">and name like '%${name}%'</if>
+  	</where>
+  </select>
+  <select id="countUserIdSearch" parameterType="com.mo1451.model.User" resultType="java.lang.Integer">
+  	select count(*) from word
+	join (select * from user where id = #{id}) user on (user.id = word.userid)
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from word
     where id = #{id,jdbcType=INTEGER}
@@ -131,24 +171,24 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.mo1451.model.WordWithBLOBs" useGeneratedKeys="true" keyProperty="id">
-  	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
-        SELECT LAST_INSERT_ID() AS ID
-    </selectKey>
-    insert into word (id, userid, causalsol, 
-      ninesol, lifesol, resourcesol, 
-      functionsol, idealsol, techsol, 
-      physol, objsol, finalsol
-      )
-    values (#{id,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{causalsol,jdbcType=LONGVARCHAR}, 
-      #{ninesol,jdbcType=LONGVARCHAR}, #{lifesol,jdbcType=LONGVARCHAR}, #{resourcesol,jdbcType=LONGVARCHAR}, 
-      #{functionsol,jdbcType=LONGVARCHAR}, #{idealsol,jdbcType=LONGVARCHAR}, #{techsol,jdbcType=LONGVARCHAR}, 
-      #{physol,jdbcType=LONGVARCHAR}, #{objsol,jdbcType=LONGVARCHAR}, #{finalsol,jdbcType=LONGVARCHAR}
-      )
+    <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+	    SELECT LAST_INSERT_ID() AS ID
+	</selectKey>
+    insert into word (id, userid, name, 
+      causalsol, ninesol, lifesol, 
+      resourcesol, functionsol, idealsol, 
+      techsol, physol, objsol, 
+      finalsol)
+    values (#{id,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
+      #{causalsol,jdbcType=LONGVARCHAR}, #{ninesol,jdbcType=LONGVARCHAR}, #{lifesol,jdbcType=LONGVARCHAR}, 
+      #{resourcesol,jdbcType=LONGVARCHAR}, #{functionsol,jdbcType=LONGVARCHAR}, #{idealsol,jdbcType=LONGVARCHAR}, 
+      #{techsol,jdbcType=LONGVARCHAR}, #{physol,jdbcType=LONGVARCHAR}, #{objsol,jdbcType=LONGVARCHAR}, 
+      #{finalsol,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.mo1451.model.WordWithBLOBs" useGeneratedKeys="true" keyProperty="id">
-    <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
-        SELECT LAST_INSERT_ID() AS ID
-    </selectKey>
+   <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+	    SELECT LAST_INSERT_ID() AS ID
+	</selectKey>
     insert into word
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -156,6 +196,9 @@
       </if>
       <if test="userid != null">
         userid,
+      </if>
+      <if test="name != null">
+        name,
       </if>
       <if test="causalsol != null">
         causalsol,
@@ -194,6 +237,9 @@
       </if>
       <if test="userid != null">
         #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
       </if>
       <if test="causalsol != null">
         #{causalsol,jdbcType=LONGVARCHAR},
@@ -242,6 +288,9 @@
       <if test="record.userid != null">
         userid = #{record.userid,jdbcType=INTEGER},
       </if>
+      <if test="record.name != null">
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
       <if test="record.causalsol != null">
         causalsol = #{record.causalsol,jdbcType=LONGVARCHAR},
       </if>
@@ -281,6 +330,7 @@
     update word
     set id = #{record.id,jdbcType=INTEGER},
       userid = #{record.userid,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR},
       causalsol = #{record.causalsol,jdbcType=LONGVARCHAR},
       ninesol = #{record.ninesol,jdbcType=LONGVARCHAR},
       lifesol = #{record.lifesol,jdbcType=LONGVARCHAR},
@@ -298,7 +348,8 @@
   <update id="updateByExample" parameterType="map">
     update word
     set id = #{record.id,jdbcType=INTEGER},
-      userid = #{record.userid,jdbcType=INTEGER}
+      userid = #{record.userid,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -308,6 +359,9 @@
     <set>
       <if test="userid != null">
         userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
       </if>
       <if test="causalsol != null">
         causalsol = #{causalsol,jdbcType=LONGVARCHAR},
@@ -345,6 +399,7 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.mo1451.model.WordWithBLOBs">
     update word
     set userid = #{userid,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
       causalsol = #{causalsol,jdbcType=LONGVARCHAR},
       ninesol = #{ninesol,jdbcType=LONGVARCHAR},
       lifesol = #{lifesol,jdbcType=LONGVARCHAR},
@@ -359,7 +414,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.mo1451.model.Word">
     update word
-    set userid = #{userid,jdbcType=INTEGER}
+    set userid = #{userid,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

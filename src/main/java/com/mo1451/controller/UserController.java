@@ -17,13 +17,18 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
+import com.mo1451.model.Page;
 import com.mo1451.model.User;
+import com.mo1451.model.Word;
+import com.mo1451.model.WordSearchResult;
+import com.mo1451.service.AllService;
 import com.mo1451.service.UserService;
+import com.mo1451.service.WordService;
+import com.mo1451.util.Proper;
 
 /**
  * @author 默1451
@@ -33,6 +38,8 @@ import com.mo1451.service.UserService;
 public class UserController {
 
 	private UserService userService;
+	private WordService wordService;
+	private AllService allservice;
 
 	/**
 	 * 注册
@@ -60,7 +67,8 @@ public class UserController {
 		UUID uuid = UUID.randomUUID();
 		u.setUuid("" + uuid);	
 		
-		this.userService.addUser(u,uuid);
+		this.userService.addUser(u);
+		this.userService.sendCheckMail(u, uuid);
 		return "mail";
 	}
 	
@@ -74,8 +82,6 @@ public class UserController {
 	public @ResponseBody Map<String,Boolean> codeJson(HttpSession session,String verifycode) {
 		Map<String,Boolean> map = new HashMap<String,Boolean>();
 		String code = (String)session.getAttribute("verCode");
-//		System.out.println(code);
-//		System.out.println(verifycode);
 		if(code.equalsIgnoreCase(verifycode)) {
 			map.put("valid", true);
 		} else {
@@ -92,14 +98,11 @@ public class UserController {
 	@RequestMapping("/userJson")
 	public @ResponseBody Map<String,Boolean> userJson(String username) {
 		Map<String,Boolean> map = new HashMap<String,Boolean>();
-//		System.out.println(username);
-		
 		if(this.userService.checkName(username)) {
 			map.put("valid", true);
 		} else {
 			map.put("valid", false);
 		}
-//		System.out.println(map);
 		return map;
 	}
 	
@@ -111,33 +114,29 @@ public class UserController {
 	@RequestMapping("/emailJson")
 	public @ResponseBody Map<String, Boolean> eamilJson(String email) {
 		Map<String,Boolean> map = new HashMap<String,Boolean>();
-//		System.out.println(username);
-		
 		if(this.userService.checkEmail(email)) {
 			map.put("valid", false);
 		} else {
 			map.put("valid", true);
 		}
-//		System.out.println(map);
 		return map;
 	}
 	
 	/**
+	 * 使用emailJson
 	 * 邮箱NotAjax
 	 * @param email
 	 * @return
 	 */
+	@Deprecated
 	@RequestMapping("/emailNotJson")
 	public @ResponseBody Map<String, Boolean> eamilNotJson(String email) {
 		Map<String,Boolean> map = new HashMap<String,Boolean>();
-//		System.out.println(username);
-		
 		if(this.userService.checkEmail(email)) {
 			map.put("valid", true);
 		} else {
 			map.put("valid", false);
 		}
-//		System.out.println(map);
 		return map;
 	}
 	
@@ -152,11 +151,10 @@ public class UserController {
 		String uuid = request.getParameter("uuid");
 		int id = Integer.parseInt(request.getParameter("id"));
 		User u = this.userService.getUserById(id); 
-//		System.out.println(u.getUuid());
-//		System.out.println(uuid);
 		if(this.userService.checkIdentity(u, uuid)) {
 			model.addAttribute("msg", "注册链接无效！<br>或许您已激活。");
 		} else {
+			this.userService.changeIdentityInfo(u);
 			model.addAttribute("msg","恭喜您，激活成功！");
 		}
 		return "checkIdentity";
@@ -186,16 +184,7 @@ public class UserController {
 		String password = request.getParameter("password");
 		List<User> users = this.userService.checkPassword(username,password);
 		if(users.size() != 0) {
-			modelMap.addFlashAttribute("user", users.get(0));
-//			request.getSession().setAttribute("username", users.get(0).getName());
-			Cookie cookie = new Cookie("userId", users.get(0).getId().toString());
-			cookie.setPath("/");
-			cookie.setMaxAge(-1);
-	        response.addCookie(cookie);
-	        cookie = new Cookie("username", users.get(0).getName());
-			cookie.setPath("/");
-			cookie.setMaxAge(-1);
-	        response.addCookie(cookie);
+			this.userService.saveUserCookies(response, users.get(0));
 			return "redirect:center/userCenter";
 		} else {
 			msg = "用户名或密码错误";
@@ -204,21 +193,71 @@ public class UserController {
 		}
 	}
 	
+	
+	
+	/**
+	 * 用户中心
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/center/userCenter")
+	public String userCenter(HttpServletRequest request, Model model) {
+		String strUserId = request.getParameter("userId");
+		String strWordId = request.getParameter("wordId");
+		String username = request.getParameter("username");
+		if(strUserId != null && !strUserId.equals("")) {
+			int userId = Integer.parseInt(strUserId);
+			int wordId = Integer.parseInt(strWordId);
+			model.addAttribute("userId", userId);
+			model.addAttribute("wordId",wordId);
+			model.addAttribute("username", username);
+		} else {
+			User u = this.getUserFromCookies(request);
+			if(u.getName().equals("admin")) {
+				return "redirect:../admin/Index";
+			}
+			model.addAttribute("userId", u.getId());
+			model.addAttribute("username", u.getName());
+			
+		}
+		return "/center/usercenter";
+	}
+	
+	private User getUserFromCookies(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		if(cookies != null) {
+			for (Cookie cookie : cookies){
+				if (cookie.getName().equals("userId")) {
+					int id = Integer.parseInt(cookie.getValue());
+					if(id == -1) {
+						User user = new User();
+						user.setId(-1);
+						user.setName("admin");
+						return user;
+					}
+					return this.userService.getUserById(id);
+				}
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * 忘记密码
 	 * @param request
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping("/forgetPassword")
-	public String forgetPassword(HttpServletRequest request,Model model) {
+	@RequestMapping("/sendChangePasswordEmail")
+	public String sendChangePasswordEmail(HttpServletRequest request,Model model) {
 		String email = request.getParameter("email");
 		String msg = "";
 		if(email != null && !email.trim().equals("")) {
 			UUID uuid = UUID.randomUUID();
 			request.getSession().setAttribute("uuid", uuid);
-			this.userService.resetPassword(email,uuid);
-			msg = "请到 邮箱重设你的密码。";
+			this.userService.sendResetPasswordEmail(email,uuid);
+			msg = "请到邮箱重设你的密码。";
 			model.addAttribute("msg", msg);
 			return "resetpassword";
 		} else {
@@ -240,18 +279,12 @@ public class UserController {
 		String uuid = request.getParameter("uuid");
 		String msg = "";
 		String u = "" + (UUID) request.getSession().getAttribute("uuid");
-//		System.out.println(u);
-//		System.out.println(uuid);
 		if(uuid.equals(u)) {
-			msg = "abc";
 			model.addAttribute("email", email);
-			model.addAttribute("msg", msg);
-//			System.out.println("ret");
 			return "resetpassword";
 		} else {
 			msg = "链接失效，请重新激活";
 			model.addAttribute("msg", msg);
-//			System.out.println("for");
 			return "forgetpassword";
 		}
 	}
@@ -269,35 +302,13 @@ public class UserController {
 		String msg = "";
 		if(this.userService.changePassword(email,password)) {
 			msg = "修改成功";
+			model.addAttribute("msg", msg);
 			return "changed";
 		} else {
-			msg = "链接失效，请重新激活";
+			msg = "该用户不存在！";
 			model.addAttribute("msg", msg);
-//			System.out.println("for");
 			return "forgetpassword";
 		}
-	}
-	
-	/**
-	 * 用户中心
-	 * @param request
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping("/center/userCenter")
-	public String userCenter(HttpServletRequest request,Model model,@ModelAttribute("user") User user) {
-//		System.out.println(user);
-		String strUserId = request.getParameter("userId");
-		String strWordId = request.getParameter("wordId");
-		String username = request.getParameter("username");
-		if(strUserId != null && !strUserId.equals("")) {
-			int userId = Integer.parseInt(strUserId);
-			int wordId = Integer.parseInt(strWordId);
-			model.addAttribute("userId", userId);
-			model.addAttribute("wordId",wordId);
-			model.addAttribute("username", username);
-		}
-		return "/center/usercenter";
 	}
 	
 	/**
@@ -346,7 +357,7 @@ public class UserController {
 	 */
 	@RequestMapping("/center/changeInfo")
 	public String changeInfo(HttpServletRequest request,Model model) {
-		int userId = Integer.parseInt(request.getParameter("userid"));
+		int userId = Integer.parseInt(request.getParameter("userId"));
 		String sex = request.getParameter("sex");
 		String industry = request.getParameter("industry");
 		String introduction = request.getParameter("introduction");
@@ -395,7 +406,38 @@ public class UserController {
 	 */
 	@RequestMapping("/center/historyWord")
 	public String historyWord(HttpServletRequest request,Model model) {
+		/*int userId = Integer.parseInt(request.getParameter("userId"));
+		String userName = request.getParameter("username");
+	//	System.out.println(userId);
+		List<Word> words = this.wordService.getWords(userId);
+		model.addAttribute("userId", userId);
+		model.addAttribute("username", userName);
+		model.addAttribute("words", words);
+		return "/center/historyword";*/
 		
+		String pageStr = request.getParameter("page");
+		String userIdString = request.getParameter("userId");
+		int page = 1;
+		int pageSize = Proper.getPageSize();
+		
+		if(pageStr != null && !pageStr.equals("")) {
+			page = Integer.parseInt(pageStr);
+		}
+		
+		if(userIdString != null && !userIdString.equals("")) {
+			int userId = Integer.parseInt(userIdString);
+			if(pageStr != null && !pageStr.equals("")) {
+				page = Integer.parseInt(pageStr);
+			}
+			Page p = new Page(page, pageSize);
+			
+			List<WordSearchResult> wordSearchResults = this.wordService.searchWordsByUserId(userId,p);
+			p.setCount(wordService.getUserIdSearchCount(userId));
+			p.resetMaxPage();
+			model.addAttribute("page", p);
+			model.addAttribute("wordSearchResults", wordSearchResults);
+			model.addAttribute("userId", userId);
+		} 
 		return "/center/historyword";
 	}
 	
@@ -406,12 +448,23 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping("/userOut")
-	public String userOut(HttpServletRequest request,Model model) {
-		request.getSession().removeAttribute("user");
+	public String userOut(HttpServletRequest request,Model model, HttpServletResponse response) {
 		Cookie cookie = new Cookie("userId", null);
 		cookie.setPath("/");
         cookie.setMaxAge(0);
+        response.addCookie(cookie);
 		return "redirect:signin";
+	}
+	
+	@RequestMapping("/admin/deleteUser")
+	public String deleteUser(HttpServletRequest request,Model model) {
+		String userIdStr = request.getParameter("userId");
+		String pageStr = request.getParameter("page");
+		if(userIdStr != null && !userIdStr.equals("")) {
+			int userId = Integer.parseInt(userIdStr);
+			allservice.deleteUserById(userId);
+		}
+		return "redirect:UserList?page=" + pageStr;
 	}
 	
 	public UserService getUserService() {
@@ -421,5 +474,23 @@ public class UserController {
 	@Resource
 	public void setUserService(UserService userService) {
 		this.userService = userService;
+	}
+
+	public WordService getWordService() {
+		return wordService;
+	}
+
+	@Resource
+	private void setWordService(WordService wordService) {
+		this.wordService = wordService;
+	}
+
+	public AllService getAllservice() {
+		return allservice;
+	}
+
+	@Resource
+	public void setAllservice(AllService allservice) {
+		this.allservice = allservice;
 	}
 }

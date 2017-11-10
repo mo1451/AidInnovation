@@ -3,7 +3,10 @@
  */
 package com.mo1451.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -126,5 +129,79 @@ public class ArrangeAndEvaluateService {
 			str[soluId][5] = eval.getFeasi() == 0 ? "" :  eval.getFeasi() + "";
 		}
 		return str;
+	}
+
+	/**
+	 * @param wordId
+	 */
+	public void deleteAll(int wordId) {
+		this.deleteEvaluate(wordId);
+	}
+	
+	public void deleteEvaluate(int wordId) {
+		EvaluateExample evaluateExample = new EvaluateExample();
+		EvaluateExample.Criteria criteria = evaluateExample.createCriteria();
+		criteria.andWordidEqualTo(wordId);
+		this.evaluateMapper.deleteByExample(evaluateExample);
+	}
+	
+	public List<Evaluate> getEvaluate(int wordId) {
+		EvaluateExample evaluateExample = new EvaluateExample();
+		EvaluateExample.Criteria criteria = evaluateExample.createCriteria();
+		criteria.andWordidEqualTo(wordId);
+		return this.evaluateMapper.selectByExample(evaluateExample);
+	}
+
+	/**
+	 * @param wordId
+	 * @param imgMap 
+	 * @return
+	 */
+	public Map<? extends String, ? extends Object> saveArrangeAndEvaluate(int wordId, Map<String, String> imgMap) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		dataMap.putAll(this.saveEvaluation(wordId, imgMap));
+		return dataMap;
+	}
+	
+	private Map<String, Object> saveEvaluation(int wordId, Map<String, String> imgMap) {
+		WordWithBLOBs wwbs = this.wordMapper.selectByPrimaryKey(wordId);
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>(); 
+		List<Evaluate> evas = this.getEvaluate(wordId);
+    	if(wwbs != null && evas.size()>0) {
+    		for(int i=0;i<8;i++) {
+				Map<String,Object> map = new HashMap<String,Object>();
+				switch(i+1) {
+				case 1:map.put("sol", wwbs.getCausalsol());
+				break;
+				case 2:map.put("sol", wwbs.getNinesol());
+				break;
+				case 3:map.put("sol", wwbs.getResourcesol());
+				break;
+				case 4:map.put("sol", wwbs.getFunctionsol());
+				break;
+				case 5:map.put("sol", wwbs.getIdealsol());
+				break;
+				case 6:map.put("sol", wwbs.getTechsol());
+				break;
+				case 7:map.put("sol", wwbs.getPhysol());
+				break;
+				case 8:map.put("sol", wwbs.getObjsol());
+				break;
+				}
+				//String summerImgPath = Path.getRealPath() + "/images/word" + wordId + "/SummerImg" + (i+1) + ".png";
+			//	map.put("img", ImgStr.getImgStr(summerImgPath));
+			//	imgMap.get("summerImg" + i);
+				map.put("img", imgMap.get("summerImg" + (i+1)));
+				list.add(map);
+			}       	
+    	} else {
+    		Map<String,Object> map = new HashMap<String,Object>();
+    		map.put("sol", "");
+    		map.put("img", "");
+    		list.add(map);
+    	}
+    	dataMap.put("eva", list);
+    	return dataMap;
 	}
 }

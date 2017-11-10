@@ -100,7 +100,7 @@
 				<div class="form-group" id="solutiondiv">
 					<label for="solution1" class="col-sm-2 control-label">思路2：</label>
 					<div class="col-sm-8">
-						<textarea class="form-control" rows="4" id="solution2" name="solution2">${solution2 }</textarea>
+						<textarea class="form-control" rows="6" id="solution2" name="solution2">${solution2 }</textarea>
 					</div>
 				</div>
 				<input type="hidden" name="wordId" value="${wordId }">

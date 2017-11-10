@@ -3,7 +3,9 @@
  */
 package com.mo1451.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -143,5 +145,66 @@ public class ProblemDescrService {
 		pdwb.setLim(restrict);
 		pdwb.setWordid(wordId);
 		this.problemDescrMapper.insertSelective(pdwb);
+	}
+
+	/**
+	 * @param wordId
+	 */
+	public void deleteProblemDescr(int wordId) {
+		ProblemDescrExample problemDescrExample = new ProblemDescrExample();
+		ProblemDescrExample.Criteria criteria = problemDescrExample.createCriteria();
+		criteria.andWordidEqualTo(wordId);
+		this.problemDescrMapper.deleteByExample(problemDescrExample);
+		
+	}
+
+	/**
+	 * @param wordId
+	 * @return
+	 */
+	public Map<? extends String, ? extends Object> saveProblemService(int wordId) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		dataMap.putAll(this.saveProblemDesc(wordId));
+		return dataMap;
+	}
+
+	/**
+	 * @param wordId
+	 * @return
+	 */
+	private Map<? extends String, ? extends Object> saveProblemDesc(int wordId) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		ProblemDescrWithBLOBs pdwb = this.checkWordId(wordId);
+		if(pdwb != null) {
+			dataMap.put("source", pdwb.getSource());
+			dataMap.put("descr", pdwb.getDescr());
+			dataMap.put("function", pdwb.getFun());
+			dataMap.put("component", pdwb.getComponent());
+			dataMap.put("principle", pdwb.getPrinciple());
+			dataMap.put("problem", pdwb.getProblem());
+			dataMap.put("parameter", pdwb.getParameter());
+			dataMap.put("goal", pdwb.getGoal());
+			dataMap.put("limit", pdwb.getLim());
+			dataMap.put("exist", pdwb.getExist());
+		} else {
+			dataMap.put("source", "");
+			dataMap.put("descr", "");
+			dataMap.put("function", "");
+			dataMap.put("component", "");
+			dataMap.put("principle", "");
+			dataMap.put("problem", "");
+			dataMap.put("parameter", "");
+			dataMap.put("goal", "");
+			dataMap.put("limit", "");
+			dataMap.put("exist", "");
+		}
+		return dataMap;
+	}
+
+	/**
+	 * @param id
+	 */
+	public void deleteAll(Integer wordId) {
+		deleteProblemDescr(wordId);
 	}	
 }

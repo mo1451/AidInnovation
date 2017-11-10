@@ -46,9 +46,36 @@
     var stage; // 创建一个舞台对象
     var scene; // 创建一个场景对象
 	
+    var saveData;
 	$(document).ready(function() {
 	
 		canvas = document.getElementById('canvas'); 
+		CanvasRenderingContext2D.prototype.wrapText = function(str,x,y){
+         //   var index = str.indexOf('-');
+            var textArray = str.split('-');
+         //   str2= str.substr(index+1,str.length);
+         //   str1= str.substr(0,index);
+		//    var textArray = new Array(str1,str2);
+		    if(textArray==undefined||textArray==null)return false;
+		    var rowCnt = textArray.length;
+		    var i = 0,imax  = rowCnt,maxLength = 0;maxText = textArray[0];
+		    for(;i<imax;i++){
+		        var nowText = textArray[i],textLength = nowText.length;
+		        if(textLength >=maxLength){
+		            maxLength = textLength;
+		            maxText = nowText;
+		        }
+		    }
+		    var maxWidth = this.measureText(maxText).width;
+		    var lineHeight = this.measureText("元").width;
+		    x+= lineHeight*(rowCnt-1)*1.7;
+		    for(var j= 0;j<textArray.length;j++){
+		        var words = textArray[j];
+		        this.fillText(words,x,y-textArray.length*lineHeight/2);
+		     //   this.fillText(words,x,y);
+		        y+= lineHeight;
+		    }
+		};
         stage = new JTopo.Stage(canvas); // 创建一个舞台对象
         scene = new JTopo.Scene(stage); // 创建一个场景对象
 		scene.addEventListener('mouseup', function(e){
@@ -154,34 +181,15 @@
 		
 		$("#createflowchart").click(function() {
 		//	alert("a");
+			createFlow();			
+		});
+		
+		function createFlow() {
 			var count2 = 0;
 			var maintext;
 			var secondtext = new Array();
 			var thirdtext = new Array();
-			CanvasRenderingContext2D.prototype.wrapText = function(str,x,y){
-	            var index = str.indexOf('-');
-	            str2= str.substr(index+1,str.length);
-	            str1= str.substr(0,index);
-			    var textArray = new Array(str1,str2);
-			    if(textArray==undefined||textArray==null)return false;
-			    var rowCnt = textArray.length;
-			    var i = 0,imax  = rowCnt,maxLength = 0;maxText = textArray[0];
-			    for(;i<imax;i++){
-			        var nowText = textArray[i],textLength = nowText.length;
-			        if(textLength >=maxLength){
-			            maxLength = textLength;
-			            maxText = nowText;
-			        }
-			    }
-			    var maxWidth = this.measureText(maxText).width;
-			    var lineHeight = this.measureText("元").width;
-			    x-= lineHeight*2;
-			    for(var j= 0;j<textArray.length;j++){
-			        var words = textArray[j];
-			        this.fillText(words,x,y);
-			        y+= lineHeight;
-			    }
-			};
+			
 			$("#showflowchart").css("display","block");
 			$("#mainreason").each(function() {
 				maintext = ($(this).val());
@@ -199,7 +207,23 @@
 					var id3str = $(this).attr("id");
 					var id3num = parseInt(id3str.substring(id3str.length - 5,id3str.length - 3));
 					if(id3num == id2num) {
-						thirdtext[count2][count3] = /*"abdfgdfsgdscd\r\nadadsfsgfds";//*/($(this).val());
+						var txt = $(this).val();
+						var txtNew = "";
+						var txtCnt = txt.length/4;
+					//	alert(txtCnt);
+						for(var i=0;i<txtCnt;i++) {
+							if((i+1)*4 < (txt.length-1)) {
+						//		alert(1);
+								txtNew += txt.substring(i*4,(i+1)*4) + "-";
+						//		alert(2);
+							} else {
+						//		alert(3);
+								txtNew += txt.substring(i*4,txt.length-1);
+						//		alert(4);
+							}
+							
+						}
+						thirdtext[count2][count3] = txtNew; //($(this).val());//"abdfgdf-sgdscda";
 			//			alert(thirdtext[count2][count3]);
 						count3 ++;
 						
@@ -217,8 +241,8 @@
 			cloudNode.fontColor = "0,0,0";
 			cloudNode.textPosition = 'Middle_Center';// 文字居中
 			cloudNode.setSize(100*2, 60*2);  // 尺寸
-            cloudNode.setLocation(260*2,30*2);            
-            cloudNode.layout = {type: 'tree', width:200*2, height: 100*2}
+            cloudNode.setLocation(400,30);            
+            cloudNode.layout = {type: 'tree', width:300, height: 200} //width:与同级之间的距离  height：与下一级之间的距离
             
             scene.add(cloudNode);
 			
@@ -232,7 +256,7 @@
                 node.radius = 15;
                 node.setLocation(-40+i*200,130);
 				node.setSize(70*2, 60*2); 
-                node.layout = {type: 'tree', width:70*2, height: 100*2};
+                node.layout = {type: 'tree', width:150, height: 200};
                 
                 scene.add(node);                                
                 var link = new JTopo.Link(cloudNode, node);
@@ -242,12 +266,6 @@
                     var vmNode = new JTopo.Node('vm-' + i + '-' + j);
                   //  vmNode.radius = 10;
                   	vmNode.text = thirdtext[i][j];
-                  	vmNode.paintText = function(a){
-                  		a.beginPath(),
-                  		a.font = this.font,
-                  		a.wrapText(this.text,this.height/2,this.height);
-                  		a.closePath()   
-                  		                }
                   	vmNode.font = '26px 宋体'; // 字体
                   	vmNode.fontColor = "0,0,0";
 					vmNode.textPosition = 'Middle_Center';// 文字居中
@@ -259,10 +277,14 @@
                 }
             }
 			
-			JTopo.layout.layoutNode(scene, cloudNode, true);			
-		});
+			JTopo.layout.layoutNode(scene, cloudNode, true);
+		}
 		
 		$("#saveimg").click(function() {
+			saveImg();
+		});
+		
+		function saveImg() {
 			var c = document.getElementById("canvas");
 			var dataURL = c.toDataURL("image/png");
 			var imageData = dataURL.substring(22);
@@ -275,11 +297,23 @@
 	            data: 'dataURL=' + imageData + '&wordId=' + ${wordId},  
 	            async : false, //同步方式  
 	            success : function() {   
+	            	alert("保存成功！");
 	            }  
 		    });  
-		});
+		}
+		
+		saveData = function saveData1() {
+			createFlow();
+			setTimeout(function(){saveImg();},40);
+			function b() {
+				var a = document.getElementById('causal');
+				a.submit();
+			}
+			setTimeout(function(){b();},50);
+		}
 		
 	});
+	saveData();
 </script>
 </head>
 <body onLoad="load()">
@@ -431,17 +465,17 @@
 					</div>
 				</div>
 				<div class="form-group" style="text-align:center;display:none;margin:0 auto;" id="showflowchart">						
-						<canvas width="1200" height="600" id="canvas" ></canvas>					
+						<canvas width="1000" height="600" id="canvas" ></canvas>					
 				</div>
 				<div class="form-group">
 					<label for="solution1" class="col-sm-2 control-label">思路1：</label>
-					<div class="col-sm-6">
-						<textarea class="form-control" rows="4" id="solution1" name="solution1">${solution1 }</textarea>
+					<div class="col-sm-8">
+						<textarea class="form-control" rows="6" id="solution1" name="solution1">${solution1 }</textarea>
 					</div>
 				</div>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
-						<button type="submit" class="btn btn-primary">提交</button>
+						<button type="button" class="btn btn-primary" id="save" onclick="saveData()">提交</button>
 						
 					</div>
 				</div>

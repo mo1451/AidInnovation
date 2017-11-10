@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -24,6 +26,7 @@ import com.mo1451.model.Function;
 import com.mo1451.model.Ninescreen;
 import com.mo1451.model.Source;
 import com.mo1451.model.WordWithBLOBs;
+import com.mo1451.service.ImgService;
 import com.mo1451.service.SystemAnalService;
 import com.mo1451.service.WordService;
 
@@ -38,24 +41,26 @@ import sun.misc.BASE64Decoder;
 public class SystemAnalController {
 
 	private SystemAnalService systemAnalService;
-	
+	private ImgService imgService;
 	private WordService wordService;
 
 	
 	@RequestMapping("/CausalImgJson")
 	public @ResponseBody String causalImgJson(HttpServletRequest request,String dataURL,String wordId) {
 		BASE64Decoder decoder = new BASE64Decoder();
-	//	System.out.println(dataURL);
-	//	System.out.println(test);
 		dataURL = dataURL.replace(" ", "+");//ajax传输过来的数据所有"+"都变成了" ".
 		try {
 			byte[] b = decoder.decodeBuffer(dataURL);//转码得到图片数据
-		//	System.out.println(b);
 			ByteArrayInputStream bais = new ByteArrayInputStream(b);
 			BufferedImage bi1 = ImageIO.read(bais);
-			String path = request.getSession().getServletContext().getRealPath("/images/cau_img" + wordId + ".png");
-			File w2 = new File(path);
+			String path = request.getSession().getServletContext().getRealPath("/images/word" + wordId);
+			File w1 = new File(path);
+			if(!w1.exists()) {
+				w1.mkdir();
+			}
+			File w2 = new File(path+"/cauImg.png");
 			ImageIO.write(bi1, "png", w2);
+			this.imgService.saveCauImgPath(w2.getPath(), wordId);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -94,58 +99,7 @@ public class SystemAnalController {
 				this.systemAnalService.deleteCause(deletedWord[i],wordId);
 			}
 		}
-//		String strCount2 = request.getParameter("count2");
-//		String[] strCount3;
-//		int count2 = 0;
-//		int[] count3 = new int[count2];
-//		if(strCount2 != null && !strCount2.equals("")) {
-//			count2 = Integer.parseInt(strCount2);
-//			strCount3 = new String[count2];
-//			count3 = new int[count2];
-//			for(int i=0;i<count2;i++) {
-//				strCount3[i] = request.getParameter("count2-" + (i+1));
-//				if(strCount3[i] != null && !strCount3[i].equals("")) {
-//					count3[i] = Integer.parseInt(strCount3[i]);
-//				} else {
-//					strCount3[i] = "";
-//					count3[i] = 0;
-//				}
-////				System.out.println(count3[i]);
-//			}
-//		}
-//		String mainReason = request.getParameter("mainreason");
-//		String[] reason2 = new String[count2];
-//		String[][] reason3 = new String[count2][50];
-//		for(int i=0;i<count2;i++) {
-//			if(i<9) {
-//				reason2[i] = request.getParameter("reason1-0" + (i+1));
-//			} else if(i>9) {
-//				reason2[i] = request.getParameter("reason1-" + (i+1));
-//			}
-//			reason3[i] = new String[count3[i]];
-//			for(int j=0;j<count3[i];j++) {
-//				if(i < 9) {
-//					if(count3[i] < 9) {
-//						reason3[i][j] = request.getParameter("reason1-0" + (i+1) + "-0" + (j+1));
-//					} else if(count3[i] > 9) {
-//						reason3[i][j] = request.getParameter("reason1-0" + (i+1) + "-" + (j+1));
-//					}
-//				} else if(i > 9) {
-//					if(count3[i] < 9) {
-//						reason3[i][j] = request.getParameter("reason1-0" + (i+1) + "-0" + (j+1));
-//					} else if(count3[i] > 9) {
-//						reason3[i][j] = request.getParameter("reason1-0" + (i+1) + "-" + (j+1));
-//					}
-//				}
-////				System.out.println(reason3[i][j]);
-//			}
-//			
-//		}
-//		if(count2 == 0) {
-//			reason2 = null;
-//			reason3 = null;
-//		}
-		WordWithBLOBs wwbs = this.wordService.findWord(wordId);
+		WordWithBLOBs wwbs = this.wordService.getWordWithBLOBs(wordId);
 		if(wwbs.getCausalsol() != null) {
 			model.addAttribute("solution1", wwbs.getCausalsol());
 		}
@@ -219,12 +173,17 @@ public class SystemAnalController {
 			name = "screen" + i;
 			screen = request.getParameter(name);
 			if(screen != null && !screen.equals("")) {
-				Ninescreen ns = this.systemAnalService.updateOrAddScreen(name, screen, wordId);
-				model.addAttribute(name, ns.getTxt());
+				this.systemAnalService.updateOrAddScreen(name, screen, wordId);
+			//	model.addAttribute(name, ns.getTxt());
 			}
 		}
 		
-		WordWithBLOBs wwbs = this.wordService.findWord(wordId);
+		
+		List<Ninescreen> ns = this.systemAnalService.getNineScreens(wordId);
+		for(int i=0;i<ns.size();i++) {
+			model.addAttribute(ns.get(i).getName(), ns.get(i).getTxt());
+		}		
+		WordWithBLOBs wwbs = this.wordService.getWordWithBLOBs(wordId);
 		if(wwbs.getNinesol() != null) {
 			model.addAttribute("solution2", wwbs.getNinesol());
 		}
@@ -243,7 +202,7 @@ public class SystemAnalController {
 
 
 		
-		WordWithBLOBs wwbs = this.wordService.findWord(wordId);
+		WordWithBLOBs wwbs = this.wordService.getWordWithBLOBs(wordId);
 		if(wwbs.getLifesol() != null) {
 			model.addAttribute("solution3", wwbs.getLifesol());
 		}
@@ -268,7 +227,7 @@ public class SystemAnalController {
 		String usable = "";
 		int countSource = 1;
 		int wordId = Integer.parseInt(strWordId);
-		WordWithBLOBs wwbs = this.wordService.findWord(wordId);
+		WordWithBLOBs wwbs = this.wordService.getWordWithBLOBs(wordId);
 		if(solution4!= null && !solution4.equals("")) {
 			this.wordService.updateSolution4(solution4, wordId);
 		}
@@ -335,6 +294,76 @@ public class SystemAnalController {
 		return "center/source";
 	}
 	
+	@RequestMapping("/ComJson")
+	public @ResponseBody int[][] ComJson(int wordId) {
+		List<ComFun> comfuns = this.systemAnalService.finComFun(wordId);
+		List<Function> funs = this.systemAnalService.findFunction(wordId);
+		String[] com = new String[]{""};
+		if(funs.size() > 0) {
+			Function fun = funs.get(0);
+			com = fun.getComponent().split("，");
+		}
+		int[][] comPosition = new int[comfuns.size()][2];
+		for(int i=0;i<comfuns.size();i++) {
+			ComFun cf = comfuns.get(i);
+			String prename = cf.getPrename();
+			String aftername = cf.getAftername();
+			for(int j=0;j<com.length;j++) {
+				if(prename.equals(com[j])) {
+					comPosition[i][0] = j+1;
+				}
+				if(aftername.equals(com[j])) {
+					comPosition[i][1] = j+1;
+				}
+			}
+		}
+	//	System.out.println(comPosition);
+		return comPosition;
+	}
+	
+	@RequestMapping("/ComChangeJson")
+	public @ResponseBody String ComChangeJson(int wordId,String val,String txt) {
+		if(val.equals("notrelative")) {
+			this.systemAnalService.deleteCom(txt,wordId);
+			
+		} else {
+			this.systemAnalService.addCom(txt,wordId);
+		}
+		return "sucess";
+	}
+	
+	@RequestMapping("/FunJson")
+	public @ResponseBody String[][] FunJson(@RequestBody Map map) {
+		int wordId = Integer.parseInt(map.get("wordId") + "");
+//		System.out.println((String)map.get("seltext"));
+//		System.out.println(wordId);
+		String[][] data = this.systemAnalService.getComFunPara(wordId,(String)map.get("seltext"));
+		return data;
+	}
+	
+	@RequestMapping("/FunImgJson")
+	public @ResponseBody String FunImgJson(HttpServletRequest request,String dataURL,String wordId) {
+		BASE64Decoder decoder = new BASE64Decoder();
+		dataURL = dataURL.replace(" ", "+");//ajax传输过来的数据所有"+"都变成了" ".
+		try {
+			byte[] b = decoder.decodeBuffer(dataURL);//转码得到图片数据
+			ByteArrayInputStream bais = new ByteArrayInputStream(b);
+			BufferedImage bi1 = ImageIO.read(bais);
+			String path = request.getSession().getServletContext().getRealPath("/images/word" + wordId);
+			File w1 = new File(path);
+			if(!w1.exists()) {
+				w1.mkdir();
+			}
+			File w2 = new File(path+"/funImg.png");
+			ImageIO.write(bi1, "png", w2);
+			this.imgService.saveFunImg(w2.getPath(), wordId);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String str = "sucess";
+		return str;
+	}
+	
 	@RequestMapping("/Function")
 	public String Function(HttpServletRequest request,Model model) {
 		String solution5 = request.getParameter("solution5");
@@ -363,10 +392,10 @@ public class SystemAnalController {
 		this.systemAnalService.updateComFun(preAfter,func,para,funtype,level,wordId);
 		
 		
-		List<ComFun> comfuns = this.systemAnalService.finComFun(wordId);
+		/*List<ComFun> comfuns = this.systemAnalService.finComFun(wordId);
 		if(comfuns.size() > 0) {
 			model.addAttribute("cfs",comfuns);
-		}
+		}*/
 		List<Function> funs = this.systemAnalService.findFunction(wordId);
 		if(funs.size() > 0) {
 			Function fun = funs.get(0);
@@ -374,7 +403,7 @@ public class SystemAnalController {
 			model.addAttribute("function", fun.getFunction());
 			model.addAttribute("component", fun.getComponent());
 		}
-		WordWithBLOBs wwbs = this.wordService.findWord(wordId);
+		WordWithBLOBs wwbs = this.wordService.getWordWithBLOBs(wordId);
 		if(wwbs.getFunctionsol() != null) {
 			model.addAttribute("solution5", wwbs.getFunctionsol());
 		}
@@ -400,6 +429,15 @@ public class SystemAnalController {
 	@Resource
 	public void setWordService(WordService wordService) {
 		this.wordService = wordService;
+	}
+
+	public ImgService getImgService() {
+		return imgService;
+	}
+
+	@Resource
+	public void setImgService(ImgService imgService) {
+		this.imgService = imgService;
 	}
 	
 }

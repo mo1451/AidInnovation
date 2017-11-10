@@ -3,16 +3,18 @@
  */
 package com.mo1451.controller;
 
+import java.io.File;
+
 import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mo1451.model.ProblemDescrWithBLOBs;
+import com.mo1451.service.ImgService;
 import com.mo1451.service.ProblemDescrService;
 
 /**
@@ -24,6 +26,7 @@ import com.mo1451.service.ProblemDescrService;
 public class ProblemDescrController {
 
 	private ProblemDescrService problemDescrService;
+	private ImgService imgService;
 	
 	/**
 	 * 项目概述
@@ -61,7 +64,7 @@ public class ProblemDescrController {
 	 * @return
 	 */
 	@RequestMapping("/initialSolution")
-	public String initialSolution(HttpServletRequest request,Model model) {				
+	public String initialSolution(HttpServletRequest request,Model model, MultipartFile pictureFile) {				
 		String function = request.getParameter("function");
 		String component = request.getParameter("component");
 		String principle = request.getParameter("principle");
@@ -73,6 +76,24 @@ public class ProblemDescrController {
 		String strWordId = request.getParameter("wordId");
 		int wordId = Integer.parseInt(strWordId);
 		if(function != null && !function.equals("")) {			
+			
+			String path = request.getSession().getServletContext().getRealPath("/images/word" + wordId);  
+	        String fileName = "prinImg.png";
+	        System.out.println(path);  
+	        File targetFile = new File(path, fileName);  
+	        if(!targetFile.exists()){  
+	            targetFile.mkdirs();  
+	        }  
+	  
+	        //保存  
+	        try {  
+	        	pictureFile.transferTo(targetFile);  
+	        	this.imgService.savePrinImgPath(targetFile.getPath(), wordId);
+	        } catch (Exception e) {  
+	            e.printStackTrace();  
+	        }  
+	//        model.addAttribute("fileUrl", request.getContextPath()+"/upload/"+fileName);  
+			
 			if(!this.problemDescrService.checkWordId(wordId,function,component,principle,mainpro,parameter,goal,restrict,existsol)) {
 				this.problemDescrService.addinitialSolution(wordId,function,component,principle,mainpro,parameter,goal,restrict,existsol);
 			}
@@ -108,5 +129,14 @@ public class ProblemDescrController {
 	@Resource
 	public void setProblemDescrService(ProblemDescrService problemDescrService) {
 		this.problemDescrService = problemDescrService;
+	}
+
+	public ImgService getImgService() {
+		return imgService;
+	}
+
+	@Resource
+	public void setImgService(ImgService imgService) {
+		this.imgService = imgService;
 	}
 }

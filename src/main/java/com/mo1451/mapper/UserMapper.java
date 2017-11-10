@@ -1,9 +1,13 @@
 package com.mo1451.mapper;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.mo1451.model.Page;
 import com.mo1451.model.User;
 import com.mo1451.model.UserExample;
-import java.util.List;
-import org.apache.ibatis.annotations.Param;
+import com.mo1451.model.UserSearch;
 
 public interface UserMapper {
     long countByExample(UserExample example);
@@ -33,4 +37,12 @@ public interface UserMapper {
     int updateByPrimaryKeyWithBLOBs(User record);
 
     int updateByPrimaryKey(User record);
+    
+    List<User> selectByPage(Page Page);
+
+	int countAllUser();
+
+	List<User> selectByUserSearch(UserSearch userSearch);
+
+	int countSearch(User user);
 }

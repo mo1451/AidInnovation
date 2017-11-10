@@ -3,7 +3,10 @@
  */
 package com.mo1451.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -24,6 +27,8 @@ import com.mo1451.model.Ninescreen;
 import com.mo1451.model.NinescreenExample;
 import com.mo1451.model.Source;
 import com.mo1451.model.SourceExample;
+import com.mo1451.util.ImgStr;
+import com.mo1451.util.Proper;
 
 /**
  * @author 默1451
@@ -477,6 +482,369 @@ public class SystemAnalService {
 		NinescreenExample.Criteria criteria = ninescreenExample.createCriteria();
 		criteria.andWordidEqualTo(wordId);
 		return this.ninescreenMapper.selectByExample(ninescreenExample);
+	}
+
+	/**
+	 * 删除组件
+	 * @param txt
+	 * @param wordId 
+	 */
+	public void deleteCom(String txt, int wordId) {
+		String[] str = txt.split(",");
+		ComFunExample comFunExample = new ComFunExample();
+		ComFunExample.Criteria criteria = comFunExample.createCriteria();
+		criteria.andPrenameEqualTo(str[0]);
+		criteria.andAfternameEqualTo(str[1]);
+		criteria.andWordidEqualTo(wordId);
+		this.comFunMapper.deleteByExample(comFunExample);
+	}
+
+	/**
+	 * 添加组件
+	 * @param txt
+	 * @param wordId
+	 */
+	public void addCom(String txt, int wordId) {
+		String[] str = txt.split(",");
+		ComFun cf = new ComFun();
+		cf.setAftername(str[1]);
+		cf.setPrename(str[0]);
+		cf.setWordid(wordId);
+		this.comFunMapper.insertSelective(cf);
+	}
+
+	/**
+	 * 获取功能组件表参数
+	 * @param wordId
+	 * @param txt 
+	 * @return
+	 */
+	public String[][] getComFunPara(int wordId, String txt) {
+		String[] comTxt = txt.split(",");
+		ComFunExample comFunExample = new ComFunExample();
+		ComFunExample.Criteria criteria = comFunExample.createCriteria();
+		criteria.andWordidEqualTo(wordId);
+		List<ComFun> cfs = this.comFunMapper.selectByExample(comFunExample);
+		String[][] str = new String[comTxt.length/2][4];
+		for(int i=0;i<str.length;i++) {
+			str[i][0] = "";
+			str[i][1] = "";
+			str[i][2] = 1 + "";
+			str[i][3] = 1 + "";
+		}
+		for(int j=0;j*2<comTxt.length;j++) {
+			for(int i=0;i<cfs.size();i++) {
+				ComFun cf = cfs.get(i);
+				if(cf.getPrename().equals(comTxt[j*2]) && cf.getAftername().equals(comTxt[j*2+1])) {
+					str[j][0] = (cf.getFunction()==null?"":cf.getFunction());
+					str[j][1] = (cf.getPara()==null?"":cf.getPara());
+					str[j][2] = (cf.getType()==null?1:cf.getType()) + "";
+					str[j][3] = (cf.getLevel()==null?1:cf.getLevel()) + "";
+					break;
+				}
+			}
+		}
+		return str;
+	}
+
+	/**
+	 * @param wordId
+	 */
+	public void deleteAll(int wordId) {
+		this.deleteCause(wordId);
+		this.deleteComFun(wordId);
+		this.deleteFunction(wordId);
+		this.deleteNinescreen(wordId);
+		this.deleteSource(wordId);
+	}
+	
+	/**
+	 * @param wordId
+	 */
+	private void deleteSource(int wordId) {
+		SourceExample sourceExample = new SourceExample();
+		SourceExample.Criteria criteria = sourceExample.createCriteria();
+		criteria.andWordidEqualTo(wordId);
+		this.sourceMapper.deleteByExample(sourceExample);
+	}
+
+	/**
+	 * @param wordId
+	 */
+	private void deleteNinescreen(int wordId) {
+		NinescreenExample ninescreenExample = new NinescreenExample();
+		NinescreenExample.Criteria criteria = ninescreenExample.createCriteria();
+		criteria.andWordidEqualTo(wordId);
+		this.ninescreenMapper.deleteByExample(ninescreenExample);
+	}
+
+	/**
+	 * @param wordId
+	 */
+	private void deleteFunction(int wordId) {
+		FunctionExample functionExample = new FunctionExample();
+		FunctionExample.Criteria criteria = functionExample.createCriteria();
+		criteria.andWordidEqualTo(wordId);
+		this.functionMapper.deleteByExample(functionExample);
+	}
+
+	public void deleteCause(int wordId) {
+		CauseExample causeExample = new CauseExample();
+		CauseExample.Criteria criteria = causeExample.createCriteria();
+		criteria.andWordidEqualTo(wordId);
+		this.causeMapper.deleteByExample(causeExample);
+	}
+	
+	public void deleteComFun(int wordId) {
+		ComFunExample comFunExample = new ComFunExample();
+		ComFunExample.Criteria criteria = comFunExample.createCriteria();
+		criteria.andWordidEqualTo(wordId);
+		this.comFunMapper.deleteByExample(comFunExample);
+	}
+
+	/**
+	 * @param wordId
+	 * @param imgMap 
+	 * @return
+	 */
+	public Map<? extends String, ? extends Object> saveSystemAnalService(int wordId, Map<String, String> imgMap) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		dataMap.putAll(this.saveNinescreen(wordId));
+		dataMap.putAll(this.saveLife(wordId, imgMap));
+		dataMap.putAll(this.saveSource(wordId));
+		dataMap.putAll(this.saveFunction(wordId, imgMap));
+		
+		return dataMap;
+	}
+
+	/**
+	 * @param wordId
+	 * @param imgMap 
+	 * @return
+	 */
+	private Map<? extends String, ? extends Object> saveFunction(int wordId, Map<String, String> imgMap) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		List<Function> funs = this.findFunction(wordId);
+    	if(funs.size() > 0) {
+			Function fun = funs.get(0);
+			List<ComFun> comfuns = this.finComFun(wordId);
+        	String comStr = fun.getComponent();
+        	String[] com = comStr.split("，");
+     //   	String funImgPath = Path.getRealPath() + "/images/word" + wordId + "/funImg.png";
+        	int funTable1Row = com.length + 1;
+        	
+        	List<List<String>> com1 = this.saveFunTable1Content(comfuns, com);   
+        	List<String> lengthList = this.saveFunTable1Length(funTable1Row);
+        	List<Map<String,Object>> com2List = this.saveFunTable2(comfuns);
+        	
+        	dataMap.putAll(this.saveFunDesc(fun));
+        	dataMap.put("com1length", lengthList);
+        	dataMap.put("com1out", com1);
+    		dataMap.put("com2out", com2List); 
+  //  		dataMap.put("funImg", ImgStr.getImgStr(funImgPath));  
+    		dataMap.put("funImg", imgMap.get("funImg"));  
+		} else {
+			dataMap.put("fun_system", "");
+        	dataMap.put("fun_function", "");
+        	dataMap.put("fun_component", "");
+        	List<List<String>> com1 = new ArrayList<List<String>>();
+    		List<String> arry = new ArrayList<String>();
+    		arry.add(" ");
+    		com1.add(arry);    	     	
+    		int length = 1;
+    		List<String> lengthList = this.saveFunTable1Length(length);
+        	dataMap.put("com1length", lengthList);
+        	List<Map<String,Object>> com2List = new ArrayList<Map<String,Object>>(); 
+			Map<String,Object> map = new HashMap<String,Object>();  
+			map.put("id", "");
+			map.put("precom", "");
+			map.put("fun", "");
+			map.put("lastcom", "");
+			map.put("para", "");
+			map.put("type", "");
+			map.put("level", "");    			
+            com2List.add(map); 
+        	dataMap.put("com1out", com1);
+    		dataMap.put("com2out", com2List); 
+    		dataMap.put("funImg", "");     
+		}
+		return dataMap;
+	}
+	
+	private Map<? extends String, ? extends Object> saveFunDesc(Function fun) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		dataMap .put("fun_system", fun.getSystem());
+    	dataMap.put("fun_function", fun.getFunction());
+    	dataMap.put("fun_component", fun.getComponent());
+    	return dataMap;
+	}
+	
+	private List<Map<String, Object>> saveFunTable2(List<ComFun> comfuns) {
+		
+    	List<Map<String,Object>> com2List = new ArrayList<Map<String,Object>>(); 
+    	String[] para = new String[]{"有益","有害"};
+    	String[] level = new String[]{"适当","不足","过度"};
+		for(int i=0;i<comfuns.size();i++) {
+			ComFun cf = comfuns.get(i);
+			Map<String,Object> map = new HashMap<String,Object>();  
+			map.put("id", i+1);
+			map.put("precom", cf.getPrename());
+			map.put("fun", cf.getFunction());
+			map.put("lastcom", cf.getAftername());
+			map.put("para", cf.getPara());
+			map.put("type", para[cf.getType()-1]);
+			map.put("level", level[cf.getLevel()-1]);	
+            com2List.add(map); 
+		}
+		return com2List;
+	}
+	
+	private List<String> saveFunTable1Length(int funTable1Row) {    	     	
+		int total = 9854;
+		List<String> lengthList = new ArrayList<String>();
+		lengthList.add(((int)(total - Math.floor(total/funTable1Row)*(funTable1Row-1))) + "");
+		for(int i=0;i<funTable1Row-1;i++) {
+			lengthList.add((int)Math.floor(total/funTable1Row) + "");
+		}	
+    	return lengthList;
+	}
+	
+	private List<List<String>> saveFunTable1Content(List<ComFun> comfuns, String[] com) {
+		List<List<String>> com1 = new ArrayList<List<String>>();
+		for(int i=0;i<=com.length;i++) {
+    		List<String> arry = new ArrayList<String>();
+    		for(int j=0;j<=com.length;j++) {
+    			if(i == 0) {
+    				arry.add(j==0?"":com[j-1]);
+    			} else {
+    				if(j == 0) {
+    					arry.add(com[i-1]);
+    				} else {
+    					arry.add(" ");
+    				}
+    			}
+    		}
+    		com1.add(arry);
+    	}
+		for(int i=0;i<comfuns.size();i++) {
+			int y = 0;
+			int x = 0;
+			ComFun cf = comfuns.get(i);
+			for(int j=0;j<com.length;j++) {
+				if(cf.getPrename().equals(com[j])) {
+					x = j;
+				}
+				if(cf.getAftername().equals(com[j])) {
+					y = j;
+				}
+			}
+			if(x != y) {
+				com1.get(x+1).set(y+1, "+");
+			}
+		}
+		return com1;
+	}
+
+	/**
+	 * @param wordId
+	 * @return
+	 */
+	private Map<? extends String, ? extends Object> saveSource(int wordId) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		List<Source> sources = this.findSource(wordId);
+    	List<Map<String,Object>> resourceList = new ArrayList<Map<String,Object>>(); 
+    	String[][] table1 = new String[3][6];
+    	String[] table2 = new String[12];
+    	for(int m=0;m<table1.length;m++) {
+			for(int n=0;n<table1[m].length;n++) {
+				table1[m][n] = ""; 
+			}
+		}
+		for(int m=0;m<table2.length;m++) {
+			table2[m] = ""; 
+		}
+    	String[] txt = {"免费","廉价","昂贵","无限","足够","不足","有益","中性","有害","成品","改变可用","需要建造"};
+    	if(sources.size() > 0) {
+			for(int i=0;i<sources.size();i++) {
+				Source source = sources.get(i);
+				int value = Integer.parseInt(source.getValue());
+				int quantity = Integer.parseInt(source.getQuantity());
+				int quality = Integer.parseInt(source.getQuality());
+				int usable = Integer.parseInt(source.getUsable());
+				int sys = Integer.parseInt(source.getSystem());
+				int type = Integer.parseInt(source.getType());
+				table1[sys-1][type-1] += (source.getName() + ",");
+				table2[value-1] += (source.getName() + ",");
+				table2[quantity+2] += (source.getName() + ",");
+				table2[quality+5] += (source.getName() + ",");
+				table2[usable+8] += (source.getName() + ",");
+				for(int m=0;m<table1.length;m++) {
+					for(int n=0;n<table1[m].length;n++) {
+						dataMap.put("table"+(m+1)+(n+1), table1[m][n]); 
+					}
+				}
+				for(int m=0;m<table2.length;m++) {
+					dataMap.put("table4"+(m+1), table2[m]); 
+				}
+				Map<String,Object> map = new HashMap<String,Object>();  
+				map.put("name", source.getName());
+				map.put("value", txt[value-1]);
+				map.put("quantity", txt[value+2]);
+				map.put("quality", txt[value+5]);
+				map.put("usable", txt[value+8]);
+				resourceList.add(map);  
+                dataMap.put("res", resourceList); 
+			}
+		} else {
+			for(int m=0;m<table1.length;m++) {
+				for(int n=0;n<table1[m].length;n++) {
+					dataMap.put("table"+(m+1)+(n+1), ""); 
+				}
+			}
+			for(int m=0;m<table2.length;m++) {
+				dataMap.put("table4"+(m+1), ""); 
+			}
+			Map<String,Object> map = new HashMap<String,Object>();  
+			map.put("name", "");
+			map.put("value", "");
+			map.put("quantity", "");
+			map.put("quality", "");
+			map.put("usable", "");
+			resourceList.add(map);  
+            dataMap.put("res", resourceList); 
+		}
+		return dataMap;
+	}
+
+	/**
+	 * @param wordId
+	 * @return
+	 */
+	private Map<? extends String, ? extends Object> saveLife(int wordId, Map<String, String> imgMap) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+	//	String lifeImgPath = Path.getRealPath() + "/images/lifeImg.png";
+	//	dataMap.put("lifeImg", ImgStr.getImgStr(lifeImgPath));
+		dataMap.put("lifeImg", imgMap.get("lifeImg"));
+		return dataMap;
+	}
+
+	/**
+	 * @param wordId
+	 * @return
+	 */
+	private Map<? extends String, ? extends Object> saveNinescreen(int wordId) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		List<Ninescreen> nss = this.getNineScreens(wordId);
+    	String[] screen = new String[9];
+    	for(int i=0;i<nss.size();i++) {
+    		Ninescreen ns = nss.get(i);
+    		int index = Integer.parseInt(ns.getName().substring(6));
+    		screen[index-1] = ns.getTxt();
+    	}
+    	for(int i=0;i<screen.length;i++) {
+    		dataMap.put("screen"+(i+1), screen[i]);
+    	}
+		return dataMap;
 	}
 
 }

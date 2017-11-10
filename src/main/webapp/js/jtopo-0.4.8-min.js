@@ -1239,7 +1239,7 @@
 					d = a.measureText("田").width;
 				a.fillStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";
 				var e = this.getTextPostion(this.textPosition, c, d);
-				a.fillText(b, e.x, e.y), a.closePath()
+				a.wrapText(b, e.x, e.y), a.closePath()
 			}
 		}, this.paintBorder = function(a) {
 			if (0 != this.borderWidth) {

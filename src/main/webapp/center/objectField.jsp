@@ -21,35 +21,63 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		var canvas = document.getElementById('canvas'); 
+		CanvasRenderingContext2D.prototype.wrapText = function(str,x,y){
+	         //   var index = str.indexOf('-');
+	            var textArray = str.split('-');
+	         //   str2= str.substr(index+1,str.length);
+	         //   str1= str.substr(0,index);
+			//    var textArray = new Array(str1,str2);
+			    if(textArray==undefined||textArray==null)return false;
+			    var rowCnt = textArray.length;
+			    var i = 0,imax  = rowCnt,maxLength = 0;maxText = textArray[0];
+			    for(;i<imax;i++){
+			        var nowText = textArray[i],textLength = nowText.length;
+			        if(textLength >=maxLength){
+			            maxLength = textLength;
+			            maxText = nowText;
+			        }
+			    }
+			    var maxWidth = this.measureText(maxText).width;
+			    var lineHeight = this.measureText("元").width;
+			    x+= lineHeight*(rowCnt-1)*1.7;
+			    for(var j= 0;j<textArray.length;j++){
+			        var words = textArray[j];
+			        this.fillText(words,x,y-textArray.length*lineHeight/2);
+			     //   this.fillText(words,x,y);
+			        y+= lineHeight;
+			    }
+			};
         var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
         var scene = new JTopo.Scene(stage); // 创建一个场景对象
-        scene.background = '../images/chartback.jpg';
+//        scene.background = '../images/chartback.jpg';
         
         var canvas1 = document.getElementById('canvas1'); 
         var stage1 = new JTopo.Stage(canvas1); // 创建一个舞台对象
         var scene1 = new JTopo.Scene(stage1); // 创建一个场景对象
-        scene1.background = '../images/chartback.jpg';
+ //       scene1.background = '../images/chartback.jpg';
         
         var canvas2 = document.getElementById('canvas2'); 
         var stage2 = new JTopo.Stage(canvas2); // 创建一个舞台对象
         var scene2 = new JTopo.Scene(stage2); // 创建一个场景对象
-        scene2.background = '../images/chartback.jpg';
+  //      scene2.background = '../images/chartback.jpg';
         
         var canvas3 = document.getElementById('canvas3'); 
         var stage3 = new JTopo.Stage(canvas3); // 创建一个舞台对象
         var scene3 = new JTopo.Scene(stage3); // 创建一个场景对象
-        scene3.background = '../images/chartback.jpg';
+  //      scene3.background = '../images/chartback.jpg';
         var nodeStr = new Array();
         nodeStr[0] = new Array("${nodes[0][0]}","${nodes[0][1]}","${nodes[0][2]}");
         nodeStr[1] = new Array("${nodes[1][0]}","${nodes[1][1]}","${nodes[1][2]}","${nodes[1][3]}");
         nodeStr[2] = new Array("${nodes[2][0]}","${nodes[2][1]}","${nodes[2][2]}","${nodes[2][3]}");
         nodeStr[3] = new Array("${nodes[3][0]}","${nodes[3][1]}","${nodes[3][2]}","${nodes[3][3]}","${nodes[3][4]}");
-        function newNode(thisSce, x, y, r, text) {
+        function newNode(thisSce, x, y, text) {
 			var circleNode = new JTopo.CircleNode(text);
-			circleNode.radius = r; // 半径
+			circleNode.radius = 32; // 半径
 			circleNode.alpha = 1;
+			circleNode.fontColor = "0,0,0";
+			circleNode.font = "20px Consolas";
 			circleNode.dragable = false;
-			circleNode.fillColor = '0, 0, 255'; // 填充颜色
+			circleNode.fillColor = '0, 180, 255'; // 填充颜色
 			circleNode.setLocation(x, y);
 			circleNode.textPosition = 'Middle_Center'; // 文本位置
 			thisSce.add(circleNode);
@@ -61,6 +89,8 @@
         function newLink(thisSce, nodeA, nodeZ, color, text, dashedPattern){
             var link = new JTopo.Link(nodeA, nodeZ, text);        
             link.lineWidth = 3; // 线宽
+            link.fontColor = "0,0,0";
+            link.font = "16px Consolas";
             link.dashedPattern = dashedPattern; // 虚线
             link.bundleOffset = 60; // 折线拐角处的长度
             link.bundleGap = 20; // 线条之间的间隔
@@ -88,9 +118,9 @@
         function solu1(str) {
         	var thiscene = scene1;
         	thiscene.clear();
-        	var node1 = newNode(thiscene,51,150,24,str[0]);
-			var node2 = newNode(thiscene,191,150,24,str[1]);
-			var nodef = newNode(thiscene,121,60,24,str[2]);
+        	var node1 = newNode(thiscene,51,150,str[0]);
+			var node2 = newNode(thiscene,191,150,str[1]);
+			var nodef = newNode(thiscene,121,60,str[2]);
 			
 			var link = newLink(thiscene,node2,node1,blue);
 			link.arrowsRadius = 10;
@@ -101,10 +131,10 @@
         function solu2(str) {
         	var thiscene = scene1;
         	thiscene.clear();
-        	var node1 = newNode(thiscene,51,130,24,str[0]);
-			var node2 = newNode(thiscene,191,130,24,str[1]);
-			var nodef = newNode(thiscene,121,40,24,str[2]);
-			var node3 = newNode(thiscene,121,180,24,str[3]);
+        	var node1 = newNode(thiscene,51,130,str[0]);
+			var node2 = newNode(thiscene,191,130,str[1]);
+			var nodef = newNode(thiscene,121,40,str[2]);
+			var node3 = newNode(thiscene,121,180,str[3]);
 			
 			var link = newLink(thiscene,node2,node1,red,"有害");
 			link.arrowsRadius = 10;
@@ -115,10 +145,10 @@
         function solu3(str) {
         	var thiscene = scene2;
         	thiscene.clear();
-        	var node1 = newNode(thiscene,49,130,24,str[0]);
-			var node2 = newNode(thiscene,189,130,24,str[1]);
-			var nodef = newNode(thiscene,119,40,24,str[2]);
-			var nodef2 = newNode(thiscene,119,180,24,str[3]);
+        	var node1 = newNode(thiscene,49,130,str[0]);
+			var node2 = newNode(thiscene,189,130,str[1]);
+			var nodef = newNode(thiscene,119,40,str[2]);
+			var nodef2 = newNode(thiscene,119,180,str[3]);
 			
 			var link = newLink(thiscene,node2,node1,red,"有害");
 			link.arrowsRadius = 10;
@@ -129,9 +159,9 @@
         function solu4(str) {
         	var thiscene = scene1;
         	thiscene.clear();
-        	var node1 = newNode(thiscene,51,150,24,str[0]);
-			var node2 = newNode(thiscene,191,150,24,str[1]);
-			var nodef = newNode(thiscene,121,60,24,str[2]);
+        	var node1 = newNode(thiscene,51,150,str[0]);
+			var node2 = newNode(thiscene,191,150,str[1]);
+			var nodef = newNode(thiscene,121,60,str[2]);
 			
 			var link = newLink(thiscene,node2,node1,blue);
 			link.arrowsRadius = 10;
@@ -141,10 +171,10 @@
         function solu5(str) {
         	var thiscene = scene2;           	
 			thiscene.clear();
-        	var node1 = newNode(thiscene,49,130,24,str[0]);
-			var node2 = newNode(thiscene,189,130,24,str[1]);
-			var nodef = newNode(thiscene,119,40,24,str[2]);
-			var node3 = newNode(thiscene,119,180,24,str[3]);
+        	var node1 = newNode(thiscene,49,130,str[0]);
+			var node2 = newNode(thiscene,189,130,str[1]);
+			var nodef = newNode(thiscene,119,40,str[2]);
+			var node3 = newNode(thiscene,119,180,str[3]);
 			
 			var link = newLink(thiscene,node2,node1,blue);
 			link.arrowsRadius = 10;
@@ -156,11 +186,11 @@
         function solu6(str) {
         	var thiscene = scene3;
         	thiscene.clear();
-        	var node1 = newNode(thiscene,48,150,24,str[0]);
-			var node2 = newNode(thiscene,188,150,24,str[1]);
-			var nodef1 = newNode(thiscene,118,60,24,str[2]);
-			var nodef2 = newNode(thiscene,258,60,24,str[3]);
-			var node3 = newNode(thiscene,328,150,24,str[4]);
+        	var node1 = newNode(thiscene,48,150,str[0]);
+			var node2 = newNode(thiscene,188,150,str[1]);
+			var nodef1 = newNode(thiscene,118,60,str[2]);
+			var nodef2 = newNode(thiscene,258,60,str[3]);
+			var node3 = newNode(thiscene,328,150,str[4]);
 			
 			var link = newLink(thiscene,node2,node1,blue);
 			link.arrowsRadius = 10;
@@ -175,8 +205,8 @@
         }
         function model1(str) {
         	//alert(str);
-        	var node1 = newNode(scene,50,150,24,str[0][0]);
-			var node2 = newNode(scene,190,150,24,str[0][1]);
+        	var node1 = newNode(scene,50,150,str[0][0]);
+			var node2 = newNode(scene,190,150,str[0][1]);
 			$("#thispro").text("不完整模型");
 			$("#type").val("1");
 			$("#thismodel").text("是第一类模型，不完整模型，有一个一般解法。");
@@ -191,9 +221,9 @@
         }
         
         function model2(str) {
-        	var node1 = newNode(scene,50,150,24,str[0][0]);
-			var node2 = newNode(scene,190,150,24,str[0][1]);
-			var nodef = newNode(scene,120,60,24,str[0][2]);
+        	var node1 = newNode(scene,50,150,str[0][0]);
+			var node2 = newNode(scene,190,150,str[0][1]);
+			var nodef = newNode(scene,120,60,str[0][2]);
 			
 			var link = newLink(scene,node2,node1,red,"有害");
 			link.arrowsRadius = 10;
@@ -218,9 +248,9 @@
         }
         
         function model3(str) {
-        	var node1 = newNode(scene,50,150,24,str[0][0]);
-			var node2 = newNode(scene,190,150,24,str[0][1]);
-			var nodef = newNode(scene,120,60,24,str[0][2]);
+        	var node1 = newNode(scene,50,150,str[0][0]);
+			var node2 = newNode(scene,190,150,str[0][1]);
+			var nodef = newNode(scene,120,60,str[0][2]);
 			
 			var link = newLink(scene,node2,node1,blue,"不足",5);
 			link.arrowsRadius = 10;
@@ -396,6 +426,35 @@
 			default:break;
 			}
 		});
+		
+		$("#saveImg").click(function() {
+			//alert();
+			var c = document.getElementById("canvas");
+			var dataURL = c.toDataURL("image/png");
+			var imageData0 = dataURL.substring(22);
+			c = document.getElementById("canvas1");
+			dataURL = c.toDataURL("image/png");
+			var imageData1 = dataURL.substring(22);
+			c = document.getElementById("canvas2");
+			dataURL = c.toDataURL("image/png");
+			var imageData2 = dataURL.substring(22);
+			c = document.getElementById("canvas3");
+			dataURL = c.toDataURL("image/png");
+			var imageData3 = dataURL.substring(22);
+			var model = $("#model").val();
+		//	stage.saveImageInfo();
+		//	alert(dataURL);
+		//	$("#img").attr("src",dataURL);
+			$.ajax({  
+	            type : 'post',  
+	            url : '${pageContext.request.contextPath}/center/ObjectImgJson',  
+	            data: 'dataURL=' + imageData0 + '&dataURL=' + imageData1 + '&dataURL=' + imageData2 + '&dataURL=' + imageData3 + '&model=' + model + '&wordId=' + ${wordId},  
+	            async : false, //同步方式  
+	            success : function() {   
+	            	alert("保存成功！");
+	            }  
+		    });  
+		});
 	});
 </script>
 
@@ -429,8 +488,8 @@
 				
 				
 				<!-- 流程图画板 -->
-				<div class="form-group" style="text-align:center;display:none;" id="showflowchart">						
-						<canvas width="300" height="270" id="canvas"></canvas>					
+				<div class="form-group" style="text-align:center;display:none;border:5px;" id="showflowchart">						
+						<canvas style="border:1px solid black;" width="300" height="270" id="canvas"></canvas>					
 				</div>
 				<input type="hidden" name="node1" id="node11" value="${nodes[0][0] }">
 				<input type="hidden" name="node1" id="node12" value="${nodes[0][1] }">
@@ -455,7 +514,7 @@
 				
 				<!-- 流程图画板 -->
 				<div class="form-group display1" style="text-align:center;display:none;" id="showflowchart1">						
-						<canvas width="300" height="270" id="canvas1"></canvas>					
+						<canvas style="border:1px solid black;" width="300" height="270" id="canvas1"></canvas>					
 				</div>
 				
 				
@@ -484,7 +543,7 @@
 				
 				<!-- 流程图画板 -->
 				<div class="form-group display2" style="text-align:center;display:none;" id="showflowchart2">						
-						<canvas width="300" height="300" id="canvas2"></canvas>					
+						<canvas style="border:1px solid black;" width="300" height="300" id="canvas2"></canvas>					
 				</div>
 				<input type="hidden" name="node3" id="node31" value="${nodes[2][0] }">
 				<input type="hidden" name="node3" id="node32" value="${nodes[2][1] }">
@@ -509,7 +568,7 @@
 				
 				<!-- 流程图画板 -->
 				<div class="form-group display3" style="text-align:center;display:none;" id="showflowchart3">						
-						<canvas width="420" height="270" id="canvas3"></canvas>					
+						<canvas style="border:1px solid black;" width="420" height="270" id="canvas3"></canvas>					
 				</div>
 				<input type="hidden" name="node4" id="node41" value="${nodes[3][0] }">
 				<input type="hidden" name="node4" id="node42" value="${nodes[3][1] }">
@@ -530,15 +589,18 @@
 				<div class="form-group" id="solutiondiv"  style="margin-top:40px;">
 					<label for="solution9" class="col-sm-2 control-label">思路9：</label>
 					<div class="col-sm-9">
-						<textarea class="form-control" rows="4" id="solution9" name="solution9">${solution9 }</textarea>
+						<textarea class="form-control" rows="6" id="solution9" name="solution9">${solution9 }</textarea>
 					</div>
 				</div>
 				
 				<!-- 提交 -->
 				
 				<div class="form-group">
-					<div class="col-sm-offset-2 col-sm-10">
-						<button type="submit" class="btn btn-primary">提交</button>						
+					<div class="col-sm-offset-2 col-sm-2">
+						<button type="submit" class="btn btn-primary">保存文字</button>						
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-primary" id="saveImg">保存图片</button>						
 					</div>
 				</div>
 			</form>

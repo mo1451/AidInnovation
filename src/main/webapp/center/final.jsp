@@ -74,7 +74,7 @@
 				<div class="form-group" id="solutiondiv"  style="margin-top:40px;">
 					<label for="solution6" class="col-sm-2 control-label">思路6：</label>
 					<div class="col-sm-8">
-						<textarea class="form-control" rows="4" id="solution6" name="solution6">${solution6 }</textarea>
+						<textarea class="form-control" rows="6" id="solution6" name="solution6">${solution6 }</textarea>
 					</div>
 				</div>
 				

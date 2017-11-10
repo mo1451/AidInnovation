@@ -31,9 +31,9 @@
 		<div class="leftnav-title">
 			<strong><span class="icon-list"></span>步骤流程</strong>
 		</div>
-		<h2 id="basicInfo">
-			<span class="icon-pencil-square-o"></span><a href="info.jsp"
-				target="right">基本信息</a>
+		<h2 id="wordName">
+			<span class="icon-pencil-square-o"></span><a href="changeWordName?wordId=${wordId }"
+				target="right">文档命名</a>
 		</h2>
 		<li></li>
 		<h2>
@@ -66,6 +66,8 @@
 		<ul>
 			<li><a href="Final?wordId=${wordId }" target="right"><span
 					class="icon-caret-right"></span>最终理想解</a></li>
+			<li><a href="StcOperator?wordId=${wordId }" target="right"><span
+					class="icon-caret-right"></span>STC算子</a></li>
 			<li><a href="Technology?wordId=${wordId }" target="right"><span
 					class="icon-caret-right"></span>技术矛盾分析</a></li>
 			<li><a href="Physical?wordId=${wordId }" target="right"><span
@@ -107,21 +109,19 @@
 				$(".leftnav ul li a").removeClass("on");
 				$(this).addClass("on");
 			})
-			$("#basicInfo").click(function() {
+			$("#wordName").click(function() {
 				$("#a_leader_txt").text($(this).text());
 			})
 			$(window).resize(function(){
-				//  alert($(window).height());
 				$(".leftnav").css("height",$(document).height()-80);
-			//	alert($(".leftnav").css("height"));
 			});
 		});
 	</script>
 	<ul class="bread">
-		<li><a href="##" id="a_leader_txt" class="icon-home">基本信息</a></li>
+		<li><a href="##" id="a_leader_txt" class="icon-home">文档命名</a></li>
 	</ul>
 	<div class="admin">
-		<iframe scrolling="auto" rameborder="0" src="info.jsp" name="right"
+		<iframe scrolling="auto" rameborder="0" src="changeWordName?wordId=${wordId }" name="right"
 			width="100%" height="100%"></iframe>
 	</div>
 	<div style="text-align:center;"></div>

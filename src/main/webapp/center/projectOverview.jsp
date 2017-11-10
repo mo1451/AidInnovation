@@ -36,7 +36,7 @@ function load()
           <label>项目来源：</label>
         </div>
         <div class="field">
-          <textarea class="input" name="source" style=" height:90px;" id="source"><c:if test="${source != null }">${source }</c:if></textarea>
+          <textarea class="input" name="source" style=" height:100px;" id="source"><c:if test="${source != null }">${source }</c:if></textarea>
         </div>
       </div>
       <input type="hidden" name="wordId" value="${wordId }"> 
@@ -45,7 +45,7 @@ function load()
           <label>问题描述：</label>
         </div>
         <div class="field">
-          <textarea class="input" name="descr" style=" height:90px;" id="descr"><c:if test="${descr != null }">${descr }</c:if></textarea>
+          <textarea class="input" name="descr" style=" height:240px;" id="descr"><c:if test="${descr != null }">${descr }</c:if></textarea>
           <div class="tips"></div>
         </div>
       </div>

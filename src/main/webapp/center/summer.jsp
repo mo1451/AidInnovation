@@ -59,12 +59,18 @@
 						options: {
 							scale: {
 				                ticks: {
-				                    beginAtZero: true
+				                    beginAtZero: true,
+				                    fontSize: 20,
+				                    suggestedMax: 10
+				                },
+				                scaleLabel: {
+				                	fontSize: 30
 				                }
 				            }
 		    			}
 					});
 					$("#showflowchart" + j).css("display","block");
+					$("#showflowchart" + j).next().css("display","block");
 				}
 			}
 			<% countRow = 0; %>
@@ -74,12 +80,11 @@
 					radar[i-1] = new Array();
 					var j = 0;
 					$("#radar" + i + " td input").each(function() {
-						radar[i-1][j++] = $(this).val();
-						
+						radar[i-1][j++] = $(this).val();						
 					});
 			//		alert(radar[])
 				}
-				var ctx = $("#canvas"); 
+				var ctx = $("#canvas0"); 
 	            var data = {
 					labels: ["复杂性", "成本", "简易程度", "智能程度", "器材数量", "可行性"],
 					datasets: [
@@ -113,9 +118,25 @@
 			            }
 	    			}
 				});
-				$("#showflowchart").css("display","block");
+				$("#showflowchart0").css("display","block");
+				$("#showflowchart0").next().css("display","block");
 			}
-			
+			if($(this).attr("id").substring(0,4) == "save") {
+			//	alert($(this).parent().prev().find("canvas").attr("id"));
+				var c = $(this).parent().prev().find("canvas").get(0);
+				var dataURL = c.toDataURL("image/png");
+				var imageData = dataURL.substring(22);
+		//		alert(dataURL);
+				$.ajax({  
+		            type : 'post',  
+		            url : '${pageContext.request.contextPath}/center/SummerImgJson',  
+		            data: 'dataURL=' + imageData + '&wordId=' + ${wordId} + '&id=' + $(c).attr("id"),  
+		            async : false, //同步方式  
+		            success : function() {   
+		            	alert("保存成功！");
+		            }  
+			    });  
+			}
 		});
 		
 		$('form').bootstrapValidator({
@@ -277,19 +298,31 @@
 					</table>
 				</div>
 				
-				<div class="form-group display1" style="text-align:center;display:none;width:400px;margin:0 auto;" id="showflowchart${j.index }">						
-						<canvas width="100" height="100" id="canvas${j.index }"></canvas>					
+				<div class="form-group" style="width:600px;margin:0 auto;">
+					<div class="display1 col-sm-10" style="display:none;" id="showflowchart${j.index }">						
+							<canvas width="100" height="100" id="canvas${j.index }"></canvas>	
+									
+					</div>
+					<div class="col-sm-2" style="display:none;padding-top:420px;">
+						<button type="button" class="btn btn-success" id="save${j.index }">保存雷达图</button>
+					</div>	
 				</div>
 				</c:forEach>
 				
 				<div class="form-group" style="margin-top:20px;">
 					<label for="solu" class="col-sm-2 control-label">最终思路：</label>
 					<div class="col-sm-9">
-						<textarea class="form-control" rows="4" id="solu" name="solu">${solu[8] }</textarea>
+						<textarea class="form-control" rows="6" id="solu" name="solu">${solu[8] }</textarea>
 					</div>
 				</div>
-				<div class="form-group display" style="text-align:center;display:none;width:600px;margin:0 auto;" id="showflowchart">						
-						<canvas width="100" height="100" id="canvas"></canvas>					
+				
+				<div class="form-group" style="width:800px;margin:0 auto;">
+					<div class="display col-sm-10" style="display:none;" id="showflowchart0">						
+							<canvas width="100" height="100" id="canvas0"></canvas>					
+					</div>
+					<div class="col-sm-2" style="display:none;padding-top:600px;">
+							<button type="button" class="btn btn-success" id="save0">保存雷达图</button>
+					</div>
 				</div>
 				<!-- 提交 -->
 				

@@ -30,7 +30,7 @@ function load()
 <div class="panel admin-panel">
   <div class="panel-head" id="add"><strong><span class="icon-pencil-square-o"></span>发明问题初始形式</strong></div>
   <div class="body-content">
-    <form method="post" class="form-x" action="initialSolution">  
+    <form method="post" class="form-x" action="initialSolution" enctype="multipart/form-data">  
       <div class="form-group">
         <div class="label">
           <label>当前系统功能：</label>
@@ -58,6 +58,16 @@ function load()
           <div class="tips"></div>
         </div>
       </div>
+      
+      <div class="form-group">
+        <div class="label">
+          <label>上传原理图：</label>
+        </div>
+        <div class="field">
+        	<input type="file" name="pictureFile" />
+        </div>
+      </div>
+      
 	  <div class="form-group">
         <div class="label">
           <label>主要问题：</label>

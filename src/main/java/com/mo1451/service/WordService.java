@@ -3,15 +3,21 @@
  */
 package com.mo1451.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
 import com.mo1451.mapper.WordMapper;
+import com.mo1451.model.Page;
+import com.mo1451.model.User;
 import com.mo1451.model.Word;
 import com.mo1451.model.WordExample;
+import com.mo1451.model.WordSearch;
+import com.mo1451.model.WordSearchResult;
 import com.mo1451.model.WordWithBLOBs;
 
 /**
@@ -58,7 +64,7 @@ public class WordService {
 	 * @param wordId
 	 * @return
 	 */
-	public WordWithBLOBs findWord(int wordId) {
+	public WordWithBLOBs getWordWithBLOBs(int wordId) {
 		WordWithBLOBs wwbs = this.wordMapper.selectByPrimaryKey(wordId);
 		return wwbs;
 	}
@@ -160,5 +166,195 @@ public class WordService {
 		WordWithBLOBs wwbs = this.wordMapper.selectByPrimaryKey(wordId);
 		wwbs.setFinalsol(finalSolu);
 		this.wordMapper.updateByPrimaryKeySelective(wwbs);
+	}
+
+	/**
+	 * @param userId
+	 * @return
+	 */
+	public List<Word> getWords(int userId) {
+		WordExample wordExample = new WordExample();
+		WordExample.Criteria criteria = wordExample.createCriteria();
+		criteria.andUseridEqualTo(userId);
+		return this.wordMapper.selectByExample(wordExample);
+	}
+	
+	public Word getWordById(int wordId) {
+		return this.wordMapper.selectByPrimaryKey(wordId);
+	}
+
+	/**
+	 * @param wordId
+	 * @return
+	 */
+	public String getWordNameById(int wordId) {
+		Word w = this.getWordById(wordId);
+		return w.getName();
+	}
+
+	/**
+	 * @param wordName
+	 * @param wordId
+	 */
+	public void updateWordName(String wordName, int wordId) {
+		Word w = this.getWordById(wordId);
+		w.setName(wordName);
+		this.wordMapper.updateByPrimaryKey(w);
+	}
+
+	/**
+	 * @param wordId
+	 */
+	public void deleteWord(int wordId) {
+		WordExample wordExample = new WordExample();
+		WordExample.Criteria criteria = wordExample.createCriteria();
+		criteria.andIdEqualTo(wordId);
+		this.wordMapper.deleteByExample(wordExample);
+	}
+
+	/**
+	 * @param wordId
+	 * @param imgMap 
+	 * @return
+	 */
+	public Map<? extends String, ? extends Object> saveWord(int wordId, Map<String, String> imgMap) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		dataMap.putAll(this.saveSolution(wordId, imgMap));
+		return dataMap;
+	}
+
+	/**
+	 * @param wordId
+	 * @param imgMap 
+	 * @return
+	 */
+	private Map<? extends String, ? extends Object> saveSolution(int wordId, Map<String, String> imgMap) {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		WordWithBLOBs wwbs = this.wordMapper.selectByPrimaryKey(wordId);
+		if(wwbs != null) {
+    		dataMap.put("causalsol", wwbs.getCausalsol());
+    		dataMap.put("ninesol", wwbs.getNinesol());
+    		dataMap.put("lifesol", wwbs.getLifesol());
+    		dataMap.put("resourcesol", wwbs.getResourcesol());
+    		dataMap.put("functionsol", wwbs.getFunctionsol());
+    		dataMap.put("idealsol", wwbs.getIdealsol());
+    		dataMap.put("techsol", wwbs.getTechsol());
+    		dataMap.put("physol", wwbs.getPhysol());
+    		dataMap.put("objsol", wwbs.getObjsol());
+    		dataMap.put("finalsolution", wwbs.getFinalsol());
+  /*  		String principleImgPath = Path.getRealPath() + "/images/word" + wordId + "/cauImg.png"; //这是错误的图片，应为原理图，这是因果图
+			dataMap.put("principleImg", ImgStr.getImgStr(principleImgPath));
+			String causalImgPath = Path.getRealPath() + "/images/word" + wordId + "/cauImg.png";
+			dataMap.put("causalImg", ImgStr.getImgStr(causalImgPath));*/
+    		dataMap.put("principleImg", imgMap.get("prinImg"));
+    		dataMap.put("causalImg", imgMap.get("caulImg"));
+    	} else {
+    		dataMap.put("causalsol", " ");
+    		dataMap.put("ninesol", " ");
+    		dataMap.put("lifesol", " ");
+    		dataMap.put("resourcesol", " ");
+    		dataMap.put("functionsol", " ");
+    		dataMap.put("idealsol", " ");
+    		dataMap.put("techsol", " ");
+    		dataMap.put("physol", " ");
+    		dataMap.put("objsol", " ");
+    		dataMap.put("finalsolution", " ");
+			dataMap.put("principleImg", " ");
+			dataMap.put("causalImg", " ");
+    	}
+		return dataMap;
+	}
+
+	/**
+	 * @param userId
+	 */
+	public void deleteWordByUserId(int userId) {
+		WordExample wordExample = new WordExample();
+		WordExample.Criteria criteria = wordExample.createCriteria();
+		criteria.andUseridEqualTo(userId);
+		this.wordMapper.deleteByExample(wordExample);
+	}
+
+	/**
+	 * @param wordId
+	 */
+	public void deleteAll(int wordId) {
+		deleteWord(wordId);
+	}
+
+	/**
+	 * @param p
+	 * @return
+	 */
+	public List<Word> getWordsByPage(Page p) {
+		return wordMapper.selectByPage(p);
+	}
+
+	/**
+	 * @param wordIdString
+	 * @param wordNameString
+	 * @param p
+	 * @return
+	 */
+	public List<WordSearchResult> search(String wordIdString, String wordNameString, Page p) {
+		WordSearch wordSearch = new WordSearch();
+		Word word = new Word();
+		if(wordIdString != null && !wordIdString.equals("")) {
+			word.setId(Integer.parseInt(wordIdString));
+		}
+		if(wordNameString != null && !wordNameString.equals("")) {
+			word.setName(wordNameString);
+		}
+		wordSearch.setPage(p);
+		wordSearch.setWord(word);
+		
+		return wordMapper.selectByWordSearch(wordSearch);
+	}
+
+	/**
+	 * @return
+	 */
+	public int getWordCount() {
+		return wordMapper.countAllWords();
+	}
+
+	/**
+	 * @param wordIdString
+	 * @param wordNameString
+	 * @return
+	 */
+	public int getSearchCount(String wordIdString, String wordNameString) {
+		Word word = new Word();
+		if(wordIdString != null && !wordIdString.equals("")) {
+			word.setId(Integer.parseInt(wordIdString));
+		}
+		if(wordNameString != null && !wordNameString.equals("")) {
+			word.setName(wordNameString);
+		}
+		return wordMapper.countSearch(word);
+	}
+
+	/**
+	 * @param userId
+	 * @param p
+	 * @return
+	 */
+	public List<WordSearchResult> searchWordsByUserId(int userId, Page p) {
+		WordSearch wordSearch = new WordSearch();
+		User user = new User();
+		user.setId(userId);
+		wordSearch.setUser(user);
+		wordSearch.setPage(p);
+		return wordMapper.selectByUserId(wordSearch);
+	}
+
+	/**
+	 * @param userId
+	 * @return
+	 */
+	public int getUserIdSearchCount(int userId) {
+		User user = new User();
+		user.setId(userId);
+		return wordMapper.countUserIdSearch(user);
 	}
 }

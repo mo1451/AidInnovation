@@ -90,4 +90,12 @@ public class User {
     public void setIntroduction(String introduction) {
         this.introduction = introduction == null ? null : introduction.trim();
     }
+    
+    public boolean isIdentityChanged() {
+		return this.getIdentity();
+	}
+    
+    public boolean isUuidRight(String uuid) {
+		return this.getUuid().equals(uuid);
+	}
 }

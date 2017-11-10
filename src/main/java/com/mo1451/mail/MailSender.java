@@ -3,8 +3,6 @@
  */
 package com.mo1451.mail;
 
-import com.mo1451.model.User;
-
 import java.util.Properties;
 import java.util.UUID;
 
@@ -27,10 +25,9 @@ public class MailSender {
 	/**
 	 * 发送激活邮件
 	 * @param uuid
-	 * @param user
+	 * @param id
 	 */
-	public void sendMail(UUID uuid,User user) {
-		int id = user.getId();
+	public void sendMail(UUID uuid,int id) {
 		Properties props = System.getProperties();
 		//设置邮件服务器主机名
 		props.setProperty("mail.host", "smtp.163.com");
@@ -66,7 +63,7 @@ public class MailSender {
 	        // 连接邮件服务器  
 	        transport.connect("innovation32", "innovation123");  
 	        // 发送邮件  
-	        transport.sendMessage(msg, new Address[] {new InternetAddress(user.getEmail())});
+	        transport.sendMessage(msg, new Address[] {new InternetAddress("1451837861@qq.com")});  
 	        // 关闭连接  
 	        transport.close();  
 		} catch (MessagingException e) {
@@ -79,9 +76,9 @@ public class MailSender {
 	/**
 	 * 发送改变密码邮件
 	 * @param uuid
-	 * @param email
+	 * @param id
 	 */
-	public void resetPassword(UUID uuid,String email) {
+	public void sendResetPasswordEmail(UUID uuid,String email) {
 		Properties props = System.getProperties();
 		//设置邮件服务器主机名
 		props.setProperty("mail.host", "smtp.163.com");

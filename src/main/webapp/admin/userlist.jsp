@@ -31,18 +31,34 @@
 					<table class="table" style="margin:auto;text-align:center;">
 						<tr>
 							<th style="text-align:center;" class="success col-sm-2">ID</th>
-							<th style="text-align:center;" class="success col-sm-6">用户名</th>
+							<th style="text-align:center;" class="success col-sm-2">用户名</th>
+							<th style="text-align:center;" class="success col-sm-4">邮箱</th>
 							<th colspan="3" style="text-align:center;" class="success col-sm-2">用户操作</th>
 						</tr>
-						
-						<tr>
-							<td>1</td>
-							<td>测试用</td>
-							<td><button type="button" class="btn btn-primary">查看文档</button></td>
-							<td><button type="button" class="btn btn-danger">删除用户</button></td>
-						</tr>					
+						<c:forEach items="${users }" var="user" varStatus="i">
+							<tr>
+							<td>${(page.page-1)*10 + i.index+1 }</td>
+							<td>${user.name }</td>
+							<td>${user.email }</td>
+							<td><a href="userDetail?userId=${user.id}"><button type="button" class="btn btn-primary">详细信息</button></a></td>
+							<td><a href="wordSearchList?userId=${user.id}"><button type="button" class="btn btn-success">查看文档</button></a></td>
+							<td><a href="deleteUser?userId=${user.id }&page=${page.page }"><button type="button" class="btn btn-danger">删除用户</button></a></td>
+						</tr>	
+						</c:forEach>
+										
 					</table>
 				</div>
+				<div>
+					<ul class="pagination">
+						<li><a href="UserList?page=1">首页</a></li>
+						<li><a href="UserList?page=${(page.page-1>0)?(page.page-1):1 }">上一页</a></li>
+						<li class="disabled"><a href="#"  onclick="return false">${page.page }</a></li>
+						<li><a href="UserList?page=${((page.page+1)<page.maxPage)?(page.page+1):page.maxPage }">下一页</a></li>
+						<li><a href="UserList?page=${page.maxPage }">尾页</a></li>		
+						<li class="disabled"><a href="#"  onclick="return false">共${page.maxPage }页</a></li>				
+					</ul>					
+				</div>
+				
 			</form>
 		</div>
 	</div>

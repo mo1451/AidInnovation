@@ -200,7 +200,7 @@ $(document).ready(function() {
 				<div class="form-group" id="solutiondiv"  style="margin-top:40px;">
 					<label for="solution7" class="col-sm-2 control-label">思路7：</label>
 					<div class="col-sm-8">
-						<textarea class="form-control" rows="4" id="solution7" name="solution7">${solution7 }</textarea>
+						<textarea class="form-control" rows="6" id="solution7" name="solution7">${solution7 }</textarea>
 					</div>
 				</div>
 				

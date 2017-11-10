@@ -32,7 +32,7 @@
 				<div class="form-group" id="solutiondiv"  style="margin-top:40px;">
 					<label for="solution1" class="col-sm-2 control-label">思路3：</label>
 					<div class="col-sm-8">
-						<textarea class="form-control" rows="4" id="solution3" name="solution3">${solution3 }</textarea>
+						<textarea class="form-control" rows="6" id="solution3" name="solution3">${solution3 }</textarea>
 					</div>
 				</div>
 				<input type="hidden" name="wordId" value="${wordId }">

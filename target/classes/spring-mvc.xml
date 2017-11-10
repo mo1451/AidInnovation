@@ -40,20 +40,33 @@
     <!-- 拦截器 -->
     <mvc:interceptors>
     	<mvc:interceptor>
-    		<mvc:mapping path="/**"/>
-    		<bean class="com.mo1451.interceptor.Interceptor1"></bean>
-    	</mvc:interceptor>
-    	<mvc:interceptor>
     		<mvc:mapping path="/center/**"/>
-    		<mvc:mapping path="/admin/**"/>
     		<mvc:exclude-mapping path="/css/**"/>
     		<mvc:exclude-mapping path="/js/**"/>
-    		<bean class="com.mo1451.interceptor.LoginInterceptor"></bean>
+    		<bean class="com.mo1451.interceptor.UserLoginInterceptor"></bean>
+    	</mvc:interceptor>
+    	<mvc:interceptor>
+    		<mvc:mapping path="/admin/**"/>
+    		<mvc:exclude-mapping path="/admin/Signin"/>
+    		<mvc:exclude-mapping path="/admin/CheckAdmin"/>
+    		<mvc:exclude-mapping path="/css/**"/>
+    		<mvc:exclude-mapping path="/js/**"/>
+    		<bean class="com.mo1451.interceptor.AdminLoginInterceptor"></bean>
     	</mvc:interceptor>
     </mvc:interceptors>
     
     <!-- 设置使用注解的类所在的包 -->  
-    <context:component-scan base-package="com.mo1451.controller" />    
+    <context:component-scan base-package="com.mo1451.controller" />   
+    
+    <!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->  
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">    
+        <!-- 默认编码 -->  
+        <property name="defaultEncoding" value="utf-8" />    
+        <!-- 文件大小最大值 -->  
+        <property name="maxUploadSize" value="5242880" />    
+        <!-- 内存中的最大值 -->  
+        <property name="maxInMemorySize" value="40960" />    
+    </bean>  
                          
     <!--                       
     避免IE执行AJAX时，返回JSON出现下载文件  

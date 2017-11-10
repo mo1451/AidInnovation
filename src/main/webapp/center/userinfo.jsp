@@ -42,7 +42,7 @@
 						</label>
 					</div>
 				</div>
-				<input type="hidden" name="userid" value="${user.id }">
+				<input type="hidden" name="userId" value="${user.id }">
 				<div class="form-group" id="industrydiv" style="margin-top:40px;">
 					<label for="industry" class="col-sm-2 control-label">所在行业：</label>
 					<div class="col-sm-8">
