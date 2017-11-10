@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+<!-- 自动装配注解 -->
+    <context:annotation-config/>
+    <context:component-scan base-package="com.mo1451" />
+    <context:component-scan base-package="com.mo1451.service" />
+<!-- AOP注解 -->
+    <aop:aspectj-autoproxy/>
+    
+    <!-- 导入DAO配置 -->  
+    <import resource="spring-dao.xml"/>  
+    
+    <!-- 导入数据库配置 -->  
+    <import resource="spring-db.xml"/>  
+      
+    <!-- 导入事务管理 -->  
+    <import resource="spring-tx.xml"/>  
+    
+    <!-- <bean id="userService" class="com.mo1451.service.UserService">
+    	<property name="userDAO" ref="userDAO"></property>
+    </bean> -->
+    
+</beans>

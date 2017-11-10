@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo1451.mapper.WordMapper">
+  <resultMap id="BaseResultMap" type="com.mo1451.model.Word">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="userid" jdbcType="INTEGER" property="userid" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.mo1451.model.WordWithBLOBs">
+    <result column="causalsol" jdbcType="LONGVARCHAR" property="causalsol" />
+    <result column="ninesol" jdbcType="LONGVARCHAR" property="ninesol" />
+    <result column="lifesol" jdbcType="LONGVARCHAR" property="lifesol" />
+    <result column="resourcesol" jdbcType="LONGVARCHAR" property="resourcesol" />
+    <result column="functionsol" jdbcType="LONGVARCHAR" property="functionsol" />
+    <result column="idealsol" jdbcType="LONGVARCHAR" property="idealsol" />
+    <result column="techsol" jdbcType="LONGVARCHAR" property="techsol" />
+    <result column="physol" jdbcType="LONGVARCHAR" property="physol" />
+    <result column="objsol" jdbcType="LONGVARCHAR" property="objsol" />
+    <result column="finalsol" jdbcType="LONGVARCHAR" property="finalsol" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, userid
+  </sql>
+  <sql id="Blob_Column_List">
+    causalsol, ninesol, lifesol, resourcesol, functionsol, idealsol, techsol, physol, 
+    objsol, finalsol
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.mo1451.model.WordExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from word
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.mo1451.model.WordExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from word
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from word
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from word
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.mo1451.model.WordExample">
+    delete from word
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.mo1451.model.WordWithBLOBs" useGeneratedKeys="true" keyProperty="id">
+  	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+        SELECT LAST_INSERT_ID() AS ID
+    </selectKey>
+    insert into word (id, userid, causalsol, 
+      ninesol, lifesol, resourcesol, 
+      functionsol, idealsol, techsol, 
+      physol, objsol, finalsol
+      )
+    values (#{id,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{causalsol,jdbcType=LONGVARCHAR}, 
+      #{ninesol,jdbcType=LONGVARCHAR}, #{lifesol,jdbcType=LONGVARCHAR}, #{resourcesol,jdbcType=LONGVARCHAR}, 
+      #{functionsol,jdbcType=LONGVARCHAR}, #{idealsol,jdbcType=LONGVARCHAR}, #{techsol,jdbcType=LONGVARCHAR}, 
+      #{physol,jdbcType=LONGVARCHAR}, #{objsol,jdbcType=LONGVARCHAR}, #{finalsol,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.mo1451.model.WordWithBLOBs" useGeneratedKeys="true" keyProperty="id">
+    <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+        SELECT LAST_INSERT_ID() AS ID
+    </selectKey>
+    insert into word
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userid != null">
+        userid,
+      </if>
+      <if test="causalsol != null">
+        causalsol,
+      </if>
+      <if test="ninesol != null">
+        ninesol,
+      </if>
+      <if test="lifesol != null">
+        lifesol,
+      </if>
+      <if test="resourcesol != null">
+        resourcesol,
+      </if>
+      <if test="functionsol != null">
+        functionsol,
+      </if>
+      <if test="idealsol != null">
+        idealsol,
+      </if>
+      <if test="techsol != null">
+        techsol,
+      </if>
+      <if test="physol != null">
+        physol,
+      </if>
+      <if test="objsol != null">
+        objsol,
+      </if>
+      <if test="finalsol != null">
+        finalsol,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null">
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="causalsol != null">
+        #{causalsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="ninesol != null">
+        #{ninesol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="lifesol != null">
+        #{lifesol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="resourcesol != null">
+        #{resourcesol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="functionsol != null">
+        #{functionsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="idealsol != null">
+        #{idealsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="techsol != null">
+        #{techsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="physol != null">
+        #{physol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="objsol != null">
+        #{objsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="finalsol != null">
+        #{finalsol,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.mo1451.model.WordExample" resultType="java.lang.Long">
+    select count(*) from word
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update word
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.userid != null">
+        userid = #{record.userid,jdbcType=INTEGER},
+      </if>
+      <if test="record.causalsol != null">
+        causalsol = #{record.causalsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.ninesol != null">
+        ninesol = #{record.ninesol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.lifesol != null">
+        lifesol = #{record.lifesol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.resourcesol != null">
+        resourcesol = #{record.resourcesol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.functionsol != null">
+        functionsol = #{record.functionsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.idealsol != null">
+        idealsol = #{record.idealsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.techsol != null">
+        techsol = #{record.techsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.physol != null">
+        physol = #{record.physol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.objsol != null">
+        objsol = #{record.objsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.finalsol != null">
+        finalsol = #{record.finalsol,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update word
+    set id = #{record.id,jdbcType=INTEGER},
+      userid = #{record.userid,jdbcType=INTEGER},
+      causalsol = #{record.causalsol,jdbcType=LONGVARCHAR},
+      ninesol = #{record.ninesol,jdbcType=LONGVARCHAR},
+      lifesol = #{record.lifesol,jdbcType=LONGVARCHAR},
+      resourcesol = #{record.resourcesol,jdbcType=LONGVARCHAR},
+      functionsol = #{record.functionsol,jdbcType=LONGVARCHAR},
+      idealsol = #{record.idealsol,jdbcType=LONGVARCHAR},
+      techsol = #{record.techsol,jdbcType=LONGVARCHAR},
+      physol = #{record.physol,jdbcType=LONGVARCHAR},
+      objsol = #{record.objsol,jdbcType=LONGVARCHAR},
+      finalsol = #{record.finalsol,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update word
+    set id = #{record.id,jdbcType=INTEGER},
+      userid = #{record.userid,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.mo1451.model.WordWithBLOBs">
+    update word
+    <set>
+      <if test="userid != null">
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="causalsol != null">
+        causalsol = #{causalsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="ninesol != null">
+        ninesol = #{ninesol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="lifesol != null">
+        lifesol = #{lifesol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="resourcesol != null">
+        resourcesol = #{resourcesol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="functionsol != null">
+        functionsol = #{functionsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="idealsol != null">
+        idealsol = #{idealsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="techsol != null">
+        techsol = #{techsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="physol != null">
+        physol = #{physol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="objsol != null">
+        objsol = #{objsol,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="finalsol != null">
+        finalsol = #{finalsol,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.mo1451.model.WordWithBLOBs">
+    update word
+    set userid = #{userid,jdbcType=INTEGER},
+      causalsol = #{causalsol,jdbcType=LONGVARCHAR},
+      ninesol = #{ninesol,jdbcType=LONGVARCHAR},
+      lifesol = #{lifesol,jdbcType=LONGVARCHAR},
+      resourcesol = #{resourcesol,jdbcType=LONGVARCHAR},
+      functionsol = #{functionsol,jdbcType=LONGVARCHAR},
+      idealsol = #{idealsol,jdbcType=LONGVARCHAR},
+      techsol = #{techsol,jdbcType=LONGVARCHAR},
+      physol = #{physol,jdbcType=LONGVARCHAR},
+      objsol = #{objsol,jdbcType=LONGVARCHAR},
+      finalsol = #{finalsol,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.mo1451.model.Word">
+    update word
+    set userid = #{userid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
