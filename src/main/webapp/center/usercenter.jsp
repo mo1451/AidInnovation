@@ -50,7 +50,7 @@
 			<span class="icon-pencil-square-o"></span><a href="userInfo?userId=${userId}" target="right">用户信息</a>
 		</h2>
 		<h2 class="basicInfo">
-			<span class="icon-pencil-square-o"></span><a href="changePassword" target="right">修改密码</a>
+			<span class="icon-pencil-square-o"></span><a href="changePassword?username=${username }" target="right">修改密码</a>
 		</h2>
 		<h2 class="basicInfo">
 			<span class="icon-pencil-square-o"></span><a href="javascript:void(0);" target="_top" id="createNewWord">新建文档</a>

@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo1451.mapper.StcOperatorMapper">
+  <resultMap id="BaseResultMap" type="com.mo1451.model.StcOperator">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="big" jdbcType="VARCHAR" property="big" />
+    <result column="small" jdbcType="VARCHAR" property="small" />
+    <result column="short_time" jdbcType="VARCHAR" property="shortTime" />
+    <result column="long_time" jdbcType="VARCHAR" property="longTime" />
+    <result column="expensive" jdbcType="VARCHAR" property="expensive" />
+    <result column="chip" jdbcType="VARCHAR" property="chip" />
+    <result column="wordid" jdbcType="INTEGER" property="wordid" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, big, small, short_time, long_time, expensive, chip, wordid
+  </sql>
+  <select id="selectByExample" parameterType="com.mo1451.model.StcOperatorExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from stc_operator
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from stc_operator
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from stc_operator
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.mo1451.model.StcOperatorExample">
+    delete from stc_operator
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.mo1451.model.StcOperator">
+    insert into stc_operator (id, big, small, 
+      short_time, long_time, expensive, 
+      chip, wordid)
+    values (#{id,jdbcType=INTEGER}, #{big,jdbcType=VARCHAR}, #{small,jdbcType=VARCHAR}, 
+      #{shortTime,jdbcType=VARCHAR}, #{longTime,jdbcType=VARCHAR}, #{expensive,jdbcType=VARCHAR}, 
+      #{chip,jdbcType=VARCHAR}, #{wordid,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.mo1451.model.StcOperator">
+    insert into stc_operator
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="big != null">
+        big,
+      </if>
+      <if test="small != null">
+        small,
+      </if>
+      <if test="shortTime != null">
+        short_time,
+      </if>
+      <if test="longTime != null">
+        long_time,
+      </if>
+      <if test="expensive != null">
+        expensive,
+      </if>
+      <if test="chip != null">
+        chip,
+      </if>
+      <if test="wordid != null">
+        wordid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="big != null">
+        #{big,jdbcType=VARCHAR},
+      </if>
+      <if test="small != null">
+        #{small,jdbcType=VARCHAR},
+      </if>
+      <if test="shortTime != null">
+        #{shortTime,jdbcType=VARCHAR},
+      </if>
+      <if test="longTime != null">
+        #{longTime,jdbcType=VARCHAR},
+      </if>
+      <if test="expensive != null">
+        #{expensive,jdbcType=VARCHAR},
+      </if>
+      <if test="chip != null">
+        #{chip,jdbcType=VARCHAR},
+      </if>
+      <if test="wordid != null">
+        #{wordid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.mo1451.model.StcOperatorExample" resultType="java.lang.Long">
+    select count(*) from stc_operator
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update stc_operator
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.big != null">
+        big = #{record.big,jdbcType=VARCHAR},
+      </if>
+      <if test="record.small != null">
+        small = #{record.small,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shortTime != null">
+        short_time = #{record.shortTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.longTime != null">
+        long_time = #{record.longTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.expensive != null">
+        expensive = #{record.expensive,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chip != null">
+        chip = #{record.chip,jdbcType=VARCHAR},
+      </if>
+      <if test="record.wordid != null">
+        wordid = #{record.wordid,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update stc_operator
+    set id = #{record.id,jdbcType=INTEGER},
+      big = #{record.big,jdbcType=VARCHAR},
+      small = #{record.small,jdbcType=VARCHAR},
+      short_time = #{record.shortTime,jdbcType=VARCHAR},
+      long_time = #{record.longTime,jdbcType=VARCHAR},
+      expensive = #{record.expensive,jdbcType=VARCHAR},
+      chip = #{record.chip,jdbcType=VARCHAR},
+      wordid = #{record.wordid,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.mo1451.model.StcOperator">
+    update stc_operator
+    <set>
+      <if test="big != null">
+        big = #{big,jdbcType=VARCHAR},
+      </if>
+      <if test="small != null">
+        small = #{small,jdbcType=VARCHAR},
+      </if>
+      <if test="shortTime != null">
+        short_time = #{shortTime,jdbcType=VARCHAR},
+      </if>
+      <if test="longTime != null">
+        long_time = #{longTime,jdbcType=VARCHAR},
+      </if>
+      <if test="expensive != null">
+        expensive = #{expensive,jdbcType=VARCHAR},
+      </if>
+      <if test="chip != null">
+        chip = #{chip,jdbcType=VARCHAR},
+      </if>
+      <if test="wordid != null">
+        wordid = #{wordid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.mo1451.model.StcOperator">
+    update stc_operator
+    set big = #{big,jdbcType=VARCHAR},
+      small = #{small,jdbcType=VARCHAR},
+      short_time = #{shortTime,jdbcType=VARCHAR},
+      long_time = #{longTime,jdbcType=VARCHAR},
+      expensive = #{expensive,jdbcType=VARCHAR},
+      chip = #{chip,jdbcType=VARCHAR},
+      wordid = #{wordid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

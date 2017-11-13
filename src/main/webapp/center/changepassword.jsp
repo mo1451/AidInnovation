@@ -77,7 +77,7 @@
 					</div>
 					<small style="color:red;">${msg }</small>
 				</div>
-				<input type="hidden" name="name" value="${user.name }">
+				<input type="hidden" name="name" value="${user.name}${username}">
 				<div class="form-group" id="nowpassworddiv"  style="margin-top:40px;">
 					<label for="nowpassword" class="col-sm-2 control-label">修改密码：</label>
 					<div class="col-sm-8">

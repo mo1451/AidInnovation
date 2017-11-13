@@ -393,6 +393,7 @@ public class UserController {
 				return "/center/changepassword";
 			}
 		} else {
+			model.addAttribute("username",request.getParameter("username"));
 			return "/center/changepassword";
 		}
 		
