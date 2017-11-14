@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo1451.mapper.ImgMapper">
+  <resultMap id="BaseResultMap" type="com.mo1451.model.Img">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="desc_img" jdbcType="VARCHAR" property="descImg" />
+    <result column="prin_img" jdbcType="VARCHAR" property="prinImg" />
+    <result column="caul_img" jdbcType="VARCHAR" property="caulImg" />
+    <result column="life_img" jdbcType="VARCHAR" property="lifeImg" />
+    <result column="fun_img" jdbcType="VARCHAR" property="funImg" />
+    <result column="object_img0" jdbcType="VARCHAR" property="objectImg0" />
+    <result column="object_img1" jdbcType="VARCHAR" property="objectImg1" />
+    <result column="object_img2" jdbcType="VARCHAR" property="objectImg2" />
+    <result column="object_img3" jdbcType="VARCHAR" property="objectImg3" />
+    <result column="summer_img0" jdbcType="VARCHAR" property="summerImg0" />
+    <result column="summer_img1" jdbcType="VARCHAR" property="summerImg1" />
+    <result column="summer_img2" jdbcType="VARCHAR" property="summerImg2" />
+    <result column="summer_img3" jdbcType="VARCHAR" property="summerImg3" />
+    <result column="summer_img4" jdbcType="VARCHAR" property="summerImg4" />
+    <result column="summer_img5" jdbcType="VARCHAR" property="summerImg5" />
+    <result column="summer_img6" jdbcType="VARCHAR" property="summerImg6" />
+    <result column="summer_img7" jdbcType="VARCHAR" property="summerImg7" />
+    <result column="summer_img8" jdbcType="VARCHAR" property="summerImg8" />
+    <result column="wordid" jdbcType="INTEGER" property="wordid" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, desc_img, prin_img, caul_img, life_img, fun_img, object_img0, object_img1, object_img2, 
+    object_img3, summer_img0, summer_img1, summer_img2, summer_img3, summer_img4, summer_img5, 
+    summer_img6, summer_img7, summer_img8, wordid
+  </sql>
+  <select id="selectByExample" parameterType="com.mo1451.model.ImgExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from img
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from img
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from img
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.mo1451.model.ImgExample">
+    delete from img
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.mo1451.model.Img">
+    insert into img (id, desc_img, prin_img, 
+      caul_img, life_img, fun_img, 
+      object_img0, object_img1, object_img2, 
+      object_img3, summer_img0, summer_img1, 
+      summer_img2, summer_img3, summer_img4, 
+      summer_img5, summer_img6, summer_img7, 
+      summer_img8, wordid)
+    values (#{id,jdbcType=INTEGER}, #{descImg,jdbcType=VARCHAR}, #{prinImg,jdbcType=VARCHAR}, 
+      #{caulImg,jdbcType=VARCHAR}, #{lifeImg,jdbcType=VARCHAR}, #{funImg,jdbcType=VARCHAR}, 
+      #{objectImg0,jdbcType=VARCHAR}, #{objectImg1,jdbcType=VARCHAR}, #{objectImg2,jdbcType=VARCHAR}, 
+      #{objectImg3,jdbcType=VARCHAR}, #{summerImg0,jdbcType=VARCHAR}, #{summerImg1,jdbcType=VARCHAR}, 
+      #{summerImg2,jdbcType=VARCHAR}, #{summerImg3,jdbcType=VARCHAR}, #{summerImg4,jdbcType=VARCHAR}, 
+      #{summerImg5,jdbcType=VARCHAR}, #{summerImg6,jdbcType=VARCHAR}, #{summerImg7,jdbcType=VARCHAR}, 
+      #{summerImg8,jdbcType=VARCHAR}, #{wordid,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.mo1451.model.Img">
+    insert into img
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="descImg != null">
+        desc_img,
+      </if>
+      <if test="prinImg != null">
+        prin_img,
+      </if>
+      <if test="caulImg != null">
+        caul_img,
+      </if>
+      <if test="lifeImg != null">
+        life_img,
+      </if>
+      <if test="funImg != null">
+        fun_img,
+      </if>
+      <if test="objectImg0 != null">
+        object_img0,
+      </if>
+      <if test="objectImg1 != null">
+        object_img1,
+      </if>
+      <if test="objectImg2 != null">
+        object_img2,
+      </if>
+      <if test="objectImg3 != null">
+        object_img3,
+      </if>
+      <if test="summerImg0 != null">
+        summer_img0,
+      </if>
+      <if test="summerImg1 != null">
+        summer_img1,
+      </if>
+      <if test="summerImg2 != null">
+        summer_img2,
+      </if>
+      <if test="summerImg3 != null">
+        summer_img3,
+      </if>
+      <if test="summerImg4 != null">
+        summer_img4,
+      </if>
+      <if test="summerImg5 != null">
+        summer_img5,
+      </if>
+      <if test="summerImg6 != null">
+        summer_img6,
+      </if>
+      <if test="summerImg7 != null">
+        summer_img7,
+      </if>
+      <if test="summerImg8 != null">
+        summer_img8,
+      </if>
+      <if test="wordid != null">
+        wordid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="descImg != null">
+        #{descImg,jdbcType=VARCHAR},
+      </if>
+      <if test="prinImg != null">
+        #{prinImg,jdbcType=VARCHAR},
+      </if>
+      <if test="caulImg != null">
+        #{caulImg,jdbcType=VARCHAR},
+      </if>
+      <if test="lifeImg != null">
+        #{lifeImg,jdbcType=VARCHAR},
+      </if>
+      <if test="funImg != null">
+        #{funImg,jdbcType=VARCHAR},
+      </if>
+      <if test="objectImg0 != null">
+        #{objectImg0,jdbcType=VARCHAR},
+      </if>
+      <if test="objectImg1 != null">
+        #{objectImg1,jdbcType=VARCHAR},
+      </if>
+      <if test="objectImg2 != null">
+        #{objectImg2,jdbcType=VARCHAR},
+      </if>
+      <if test="objectImg3 != null">
+        #{objectImg3,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg0 != null">
+        #{summerImg0,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg1 != null">
+        #{summerImg1,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg2 != null">
+        #{summerImg2,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg3 != null">
+        #{summerImg3,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg4 != null">
+        #{summerImg4,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg5 != null">
+        #{summerImg5,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg6 != null">
+        #{summerImg6,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg7 != null">
+        #{summerImg7,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg8 != null">
+        #{summerImg8,jdbcType=VARCHAR},
+      </if>
+      <if test="wordid != null">
+        #{wordid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.mo1451.model.ImgExample" resultType="java.lang.Long">
+    select count(*) from img
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update img
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.descImg != null">
+        desc_img = #{record.descImg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.prinImg != null">
+        prin_img = #{record.prinImg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.caulImg != null">
+        caul_img = #{record.caulImg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.lifeImg != null">
+        life_img = #{record.lifeImg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funImg != null">
+        fun_img = #{record.funImg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.objectImg0 != null">
+        object_img0 = #{record.objectImg0,jdbcType=VARCHAR},
+      </if>
+      <if test="record.objectImg1 != null">
+        object_img1 = #{record.objectImg1,jdbcType=VARCHAR},
+      </if>
+      <if test="record.objectImg2 != null">
+        object_img2 = #{record.objectImg2,jdbcType=VARCHAR},
+      </if>
+      <if test="record.objectImg3 != null">
+        object_img3 = #{record.objectImg3,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summerImg0 != null">
+        summer_img0 = #{record.summerImg0,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summerImg1 != null">
+        summer_img1 = #{record.summerImg1,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summerImg2 != null">
+        summer_img2 = #{record.summerImg2,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summerImg3 != null">
+        summer_img3 = #{record.summerImg3,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summerImg4 != null">
+        summer_img4 = #{record.summerImg4,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summerImg5 != null">
+        summer_img5 = #{record.summerImg5,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summerImg6 != null">
+        summer_img6 = #{record.summerImg6,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summerImg7 != null">
+        summer_img7 = #{record.summerImg7,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summerImg8 != null">
+        summer_img8 = #{record.summerImg8,jdbcType=VARCHAR},
+      </if>
+      <if test="record.wordid != null">
+        wordid = #{record.wordid,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update img
+    set id = #{record.id,jdbcType=INTEGER},
+      desc_img = #{record.descImg,jdbcType=VARCHAR},
+      prin_img = #{record.prinImg,jdbcType=VARCHAR},
+      caul_img = #{record.caulImg,jdbcType=VARCHAR},
+      life_img = #{record.lifeImg,jdbcType=VARCHAR},
+      fun_img = #{record.funImg,jdbcType=VARCHAR},
+      object_img0 = #{record.objectImg0,jdbcType=VARCHAR},
+      object_img1 = #{record.objectImg1,jdbcType=VARCHAR},
+      object_img2 = #{record.objectImg2,jdbcType=VARCHAR},
+      object_img3 = #{record.objectImg3,jdbcType=VARCHAR},
+      summer_img0 = #{record.summerImg0,jdbcType=VARCHAR},
+      summer_img1 = #{record.summerImg1,jdbcType=VARCHAR},
+      summer_img2 = #{record.summerImg2,jdbcType=VARCHAR},
+      summer_img3 = #{record.summerImg3,jdbcType=VARCHAR},
+      summer_img4 = #{record.summerImg4,jdbcType=VARCHAR},
+      summer_img5 = #{record.summerImg5,jdbcType=VARCHAR},
+      summer_img6 = #{record.summerImg6,jdbcType=VARCHAR},
+      summer_img7 = #{record.summerImg7,jdbcType=VARCHAR},
+      summer_img8 = #{record.summerImg8,jdbcType=VARCHAR},
+      wordid = #{record.wordid,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.mo1451.model.Img">
+    update img
+    <set>
+      <if test="descImg != null">
+        desc_img = #{descImg,jdbcType=VARCHAR},
+      </if>
+      <if test="prinImg != null">
+        prin_img = #{prinImg,jdbcType=VARCHAR},
+      </if>
+      <if test="caulImg != null">
+        caul_img = #{caulImg,jdbcType=VARCHAR},
+      </if>
+      <if test="lifeImg != null">
+        life_img = #{lifeImg,jdbcType=VARCHAR},
+      </if>
+      <if test="funImg != null">
+        fun_img = #{funImg,jdbcType=VARCHAR},
+      </if>
+      <if test="objectImg0 != null">
+        object_img0 = #{objectImg0,jdbcType=VARCHAR},
+      </if>
+      <if test="objectImg1 != null">
+        object_img1 = #{objectImg1,jdbcType=VARCHAR},
+      </if>
+      <if test="objectImg2 != null">
+        object_img2 = #{objectImg2,jdbcType=VARCHAR},
+      </if>
+      <if test="objectImg3 != null">
+        object_img3 = #{objectImg3,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg0 != null">
+        summer_img0 = #{summerImg0,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg1 != null">
+        summer_img1 = #{summerImg1,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg2 != null">
+        summer_img2 = #{summerImg2,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg3 != null">
+        summer_img3 = #{summerImg3,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg4 != null">
+        summer_img4 = #{summerImg4,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg5 != null">
+        summer_img5 = #{summerImg5,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg6 != null">
+        summer_img6 = #{summerImg6,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg7 != null">
+        summer_img7 = #{summerImg7,jdbcType=VARCHAR},
+      </if>
+      <if test="summerImg8 != null">
+        summer_img8 = #{summerImg8,jdbcType=VARCHAR},
+      </if>
+      <if test="wordid != null">
+        wordid = #{wordid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.mo1451.model.Img">
+    update img
+    set desc_img = #{descImg,jdbcType=VARCHAR},
+      prin_img = #{prinImg,jdbcType=VARCHAR},
+      caul_img = #{caulImg,jdbcType=VARCHAR},
+      life_img = #{lifeImg,jdbcType=VARCHAR},
+      fun_img = #{funImg,jdbcType=VARCHAR},
+      object_img0 = #{objectImg0,jdbcType=VARCHAR},
+      object_img1 = #{objectImg1,jdbcType=VARCHAR},
+      object_img2 = #{objectImg2,jdbcType=VARCHAR},
+      object_img3 = #{objectImg3,jdbcType=VARCHAR},
+      summer_img0 = #{summerImg0,jdbcType=VARCHAR},
+      summer_img1 = #{summerImg1,jdbcType=VARCHAR},
+      summer_img2 = #{summerImg2,jdbcType=VARCHAR},
+      summer_img3 = #{summerImg3,jdbcType=VARCHAR},
+      summer_img4 = #{summerImg4,jdbcType=VARCHAR},
+      summer_img5 = #{summerImg5,jdbcType=VARCHAR},
+      summer_img6 = #{summerImg6,jdbcType=VARCHAR},
+      summer_img7 = #{summerImg7,jdbcType=VARCHAR},
+      summer_img8 = #{summerImg8,jdbcType=VARCHAR},
+      wordid = #{wordid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo1451.mapper.ObjFieldMapper">
+  <resultMap id="BaseResultMap" type="com.mo1451.model.ObjField">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="node1" jdbcType="VARCHAR" property="node1" />
+    <result column="node2" jdbcType="VARCHAR" property="node2" />
+    <result column="node3" jdbcType="VARCHAR" property="node3" />
+    <result column="node4" jdbcType="VARCHAR" property="node4" />
+    <result column="txt" jdbcType="VARCHAR" property="txt" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="wordid" jdbcType="INTEGER" property="wordid" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.mo1451.model.ObjFieldWithBLOBs">
+    <result column="explain1" jdbcType="LONGVARCHAR" property="explain1" />
+    <result column="explain2" jdbcType="LONGVARCHAR" property="explain2" />
+    <result column="explain3" jdbcType="LONGVARCHAR" property="explain3" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, node1, node2, node3, node4, txt, type, wordid
+  </sql>
+  <sql id="Blob_Column_List">
+    explain1, explain2, explain3
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.mo1451.model.ObjFieldExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from obj_field
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.mo1451.model.ObjFieldExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from obj_field
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from obj_field
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from obj_field
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.mo1451.model.ObjFieldExample">
+    delete from obj_field
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.mo1451.model.ObjFieldWithBLOBs">
+    insert into obj_field (id, node1, node2, 
+      node3, node4, txt, 
+      type, wordid, explain1, 
+      explain2, explain3)
+    values (#{id,jdbcType=INTEGER}, #{node1,jdbcType=VARCHAR}, #{node2,jdbcType=VARCHAR}, 
+      #{node3,jdbcType=VARCHAR}, #{node4,jdbcType=VARCHAR}, #{txt,jdbcType=VARCHAR}, 
+      #{type,jdbcType=INTEGER}, #{wordid,jdbcType=INTEGER}, #{explain1,jdbcType=LONGVARCHAR}, 
+      #{explain2,jdbcType=LONGVARCHAR}, #{explain3,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.mo1451.model.ObjFieldWithBLOBs">
+    insert into obj_field
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="node1 != null">
+        node1,
+      </if>
+      <if test="node2 != null">
+        node2,
+      </if>
+      <if test="node3 != null">
+        node3,
+      </if>
+      <if test="node4 != null">
+        node4,
+      </if>
+      <if test="txt != null">
+        txt,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="wordid != null">
+        wordid,
+      </if>
+      <if test="explain1 != null">
+        explain1,
+      </if>
+      <if test="explain2 != null">
+        explain2,
+      </if>
+      <if test="explain3 != null">
+        explain3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="node1 != null">
+        #{node1,jdbcType=VARCHAR},
+      </if>
+      <if test="node2 != null">
+        #{node2,jdbcType=VARCHAR},
+      </if>
+      <if test="node3 != null">
+        #{node3,jdbcType=VARCHAR},
+      </if>
+      <if test="node4 != null">
+        #{node4,jdbcType=VARCHAR},
+      </if>
+      <if test="txt != null">
+        #{txt,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="wordid != null">
+        #{wordid,jdbcType=INTEGER},
+      </if>
+      <if test="explain1 != null">
+        #{explain1,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="explain2 != null">
+        #{explain2,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="explain3 != null">
+        #{explain3,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.mo1451.model.ObjFieldExample" resultType="java.lang.Long">
+    select count(*) from obj_field
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update obj_field
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.node1 != null">
+        node1 = #{record.node1,jdbcType=VARCHAR},
+      </if>
+      <if test="record.node2 != null">
+        node2 = #{record.node2,jdbcType=VARCHAR},
+      </if>
+      <if test="record.node3 != null">
+        node3 = #{record.node3,jdbcType=VARCHAR},
+      </if>
+      <if test="record.node4 != null">
+        node4 = #{record.node4,jdbcType=VARCHAR},
+      </if>
+      <if test="record.txt != null">
+        txt = #{record.txt,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null">
+        type = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.wordid != null">
+        wordid = #{record.wordid,jdbcType=INTEGER},
+      </if>
+      <if test="record.explain1 != null">
+        explain1 = #{record.explain1,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.explain2 != null">
+        explain2 = #{record.explain2,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.explain3 != null">
+        explain3 = #{record.explain3,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update obj_field
+    set id = #{record.id,jdbcType=INTEGER},
+      node1 = #{record.node1,jdbcType=VARCHAR},
+      node2 = #{record.node2,jdbcType=VARCHAR},
+      node3 = #{record.node3,jdbcType=VARCHAR},
+      node4 = #{record.node4,jdbcType=VARCHAR},
+      txt = #{record.txt,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=INTEGER},
+      wordid = #{record.wordid,jdbcType=INTEGER},
+      explain1 = #{record.explain1,jdbcType=LONGVARCHAR},
+      explain2 = #{record.explain2,jdbcType=LONGVARCHAR},
+      explain3 = #{record.explain3,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update obj_field
+    set id = #{record.id,jdbcType=INTEGER},
+      node1 = #{record.node1,jdbcType=VARCHAR},
+      node2 = #{record.node2,jdbcType=VARCHAR},
+      node3 = #{record.node3,jdbcType=VARCHAR},
+      node4 = #{record.node4,jdbcType=VARCHAR},
+      txt = #{record.txt,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=INTEGER},
+      wordid = #{record.wordid,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.mo1451.model.ObjFieldWithBLOBs">
+    update obj_field
+    <set>
+      <if test="node1 != null">
+        node1 = #{node1,jdbcType=VARCHAR},
+      </if>
+      <if test="node2 != null">
+        node2 = #{node2,jdbcType=VARCHAR},
+      </if>
+      <if test="node3 != null">
+        node3 = #{node3,jdbcType=VARCHAR},
+      </if>
+      <if test="node4 != null">
+        node4 = #{node4,jdbcType=VARCHAR},
+      </if>
+      <if test="txt != null">
+        txt = #{txt,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="wordid != null">
+        wordid = #{wordid,jdbcType=INTEGER},
+      </if>
+      <if test="explain1 != null">
+        explain1 = #{explain1,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="explain2 != null">
+        explain2 = #{explain2,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="explain3 != null">
+        explain3 = #{explain3,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.mo1451.model.ObjFieldWithBLOBs">
+    update obj_field
+    set node1 = #{node1,jdbcType=VARCHAR},
+      node2 = #{node2,jdbcType=VARCHAR},
+      node3 = #{node3,jdbcType=VARCHAR},
+      node4 = #{node4,jdbcType=VARCHAR},
+      txt = #{txt,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      wordid = #{wordid,jdbcType=INTEGER},
+      explain1 = #{explain1,jdbcType=LONGVARCHAR},
+      explain2 = #{explain2,jdbcType=LONGVARCHAR},
+      explain3 = #{explain3,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.mo1451.model.ObjField">
+    update obj_field
+    set node1 = #{node1,jdbcType=VARCHAR},
+      node2 = #{node2,jdbcType=VARCHAR},
+      node3 = #{node3,jdbcType=VARCHAR},
+      node4 = #{node4,jdbcType=VARCHAR},
+      txt = #{txt,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      wordid = #{wordid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
